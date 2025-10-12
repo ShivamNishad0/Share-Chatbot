@@ -1,5 +1,6 @@
 chatbots.db
 credentials.txt
+set_credentials_data.txt
 check_embedded_chatbot.html
 TODO.md
 backend/tests
