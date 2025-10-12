@@ -86,7 +86,7 @@ class DatabaseService:
                 border_color TEXT,
                 border_thickness TEXT,
                 nav_border_color TEXT,
-                nav_border_thickness TEXT
+                nav_border_thickness TEXT,
             )
         """)
 

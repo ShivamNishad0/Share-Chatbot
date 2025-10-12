@@ -1456,7 +1456,12 @@ def save_chatbot():
 
         username = data['username']
         data_source = data.get('data_source')
-        selected_items = data.getlist('selected_items')
+
+        # Always use the global selections set by /set_items, as the form may not send selected_items
+        if data_source == 'google_sheets':
+            selected_items = CONFIG.get('selected_sheets', [])
+        else:
+            selected_items = selected_tables
 
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
