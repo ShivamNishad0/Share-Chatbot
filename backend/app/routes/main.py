@@ -1457,12 +1457,6 @@ def save_chatbot():
         username = data['username']
         data_source = data.get('data_source')
 
-        # Always use the global selections set by /set_items, as the form may not send selected_items
-        if data_source == 'google_sheets':
-            selected_items = CONFIG.get('selected_sheets', [])
-        else:
-            selected_items = selected_tables
-
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         # Removed user existence check as username is not required for saving chatbot
@@ -1494,9 +1488,9 @@ def save_chatbot():
         snowflake_role = None
 
         if data_source == 'google_sheets':
-            selected_sheets = json.dumps(selected_items)
+            selected_sheets = data.get('selected_sheets')
         elif data_source == 'neo4j':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             db_host = data.get('neo4j_uri')
             db_port = None
             db_name = data.get('neo4j_db_name')
@@ -1504,11 +1498,11 @@ def save_chatbot():
             db_username = data.get('neo4j_username')
             db_password = data.get('neo4j_password')
         elif data_source == 'mongodb':
-            selected_collections = json.dumps(selected_items)
+            selected_collections = data.get('selected_collections')
             mongo_uri = data.get('mongo_uri')
             mongo_db_name = data.get('mongo_db_name')
         elif data_source == 'oracle':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             db_host = data.get('db_host')
             db_port_str = data.get('db_port')
             db_port = int(db_port_str) if db_port_str else None
@@ -1516,7 +1510,7 @@ def save_chatbot():
             db_username = data.get('db_username')
             db_password = data.get('db_password')
         elif data_source == 'mssql':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             db_host = data.get('db_host')
             db_port_str = data.get('db_port')
             db_port = int(db_port_str) if db_port_str else None
@@ -1524,20 +1518,20 @@ def save_chatbot():
             db_username = data.get('db_username')
             db_password = data.get('db_password')
         elif data_source == 'airtable':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             airtable_api_key = data.get('airtable_api_key')
             airtable_base_id = data.get('airtable_base_id')
         elif data_source == 'databricks':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             databricks_hostname = data.get('databricks_hostname')
             databricks_http_path = data.get('databricks_http_path')
             databricks_token = data.get('databricks_token')
         elif data_source == 'supabase':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             supabase_url = data.get('supabase_url')
             supabase_anon_key = data.get('supabase_anon_key')
         elif data_source == 'snowflake':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             snowflake_account = data.get('snowflake_account')
             snowflake_user = data.get('snowflake_user')
             snowflake_password = data.get('snowflake_password')
@@ -1546,10 +1540,10 @@ def save_chatbot():
             snowflake_schema = data.get('snowflake_schema')
             snowflake_role = data.get('snowflake_role')
         elif data_source == 'odoo':
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             # Odoo fields are handled in chatbot_data
         else:
-            selected_tables = json.dumps(selected_items)
+            selected_tables = data.get('selected_tables')
             db_host = data.get('db_host')
             db_port_str = data.get('db_port')
             db_port = int(db_port_str) if db_port_str else None

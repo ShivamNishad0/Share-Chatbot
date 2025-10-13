@@ -23,7 +23,7 @@
             z-index: 10000;
         }
         #chatContainer {
-            max-width: 600px;
+            max-width: 1500px;
             margin: 40px auto 0 auto;
             border: 1px solid #ccc;
             border-radius: 8px;
@@ -31,7 +31,7 @@
             padding: 20px;
             display: none;
             flex-direction: column;
-            height: 500px;
+            height: 650px;
         }
         #chatMessages {
             flex-grow: 1;
