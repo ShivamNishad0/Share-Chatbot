@@ -2,7 +2,7 @@
 FROM php:8.2-apache
 
 # Copy the frontend files to the Apache document root
-COPY . /var/www/html/
+COPY frontend/ /var/www/html/
 
 # Expose port 80
 EXPOSE 80
