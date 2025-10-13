@@ -189,7 +189,7 @@
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
 
-        const API_BASE = 'http://localhost:5001';
+        const API_BASE = 'https://share-chatbot-2.onrender.com';
 
         let clickCount = 0;
         let configured = false;

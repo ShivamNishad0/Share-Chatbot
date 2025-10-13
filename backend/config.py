@@ -7,7 +7,7 @@ class Config:
     PORT = int(os.environ.get('PORT') or 5001)
 
     # CORS settings - allow frontend domain
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or 'https://chatbots-frontend.onrender.com'
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or 'https://share-chatbot-1.onrender.com'
 
     # Database settings
     DATABASE_URL = os.environ.get('DATABASE_URL') or 'chatbots.db'
@@ -18,5 +18,5 @@ class Config:
     @property
     def FRONTEND_URL(self):
         if self.IS_RENDER:
-            return 'https://chatbots-frontend.onrender.com'
+            return 'https://share-chatbot-1.onrender.com'
         return 'http://localhost:8000'
