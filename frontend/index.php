@@ -68,6 +68,14 @@
             border-color: red;
             color: white;
         }
+        #refreshBtn {
+            background: transparent;
+            border: none;
+            color: #6c757d;
+        }
+        #refreshBtn:hover {
+            background: rgba(108, 117, 125, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -159,7 +167,10 @@
     </div>
 
     <div id="chatContainer" class="d-flex flex-column">
-        <h4 id="chatTitle"></h4>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 id="chatTitle" class="mb-0"></h4>
+            <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄</button>
+        </div>
         <div id="chatMessages"></div>
         <div class="input-group">
             <input type="text" id="userInput" class="form-control" placeholder="Ask your chatbot..." autocomplete="off" />
@@ -188,8 +199,10 @@
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
 
-        const API_BASE = 'https://share-chatbot-2.onrender.com';
+        // const API_BASE = 'https://share-chatbot-2.onrender.com';
+        const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
@@ -774,6 +787,11 @@
                 micBtn.classList.add('recording');
                 micBtn.textContent = '🔴';
             }
+        });
+
+        refreshBtn.addEventListener('click', () => {
+            chatMessages.innerHTML = '';
+            appendMessage('bot', 'Chat refreshed. Start a new conversation!');
         });
 
         async function sendMessage() {
