@@ -1414,7 +1414,7 @@ def chat():
             cursor.close()
         data_desc = "Database data"
 
-    prompt = system_instruction + f"\nSpreadsheet data: {json.dumps(all_data, indent=2, default=str)}\nUser: {user_input}"
+    prompt = system_instruction + f"\nData: {json.dumps(all_data, indent=2, default=str)}\nUser: {user_input}"
     logging.info(f"Prompt length: {len(prompt)}, data keys: {list(all_data.keys())}")
 
     if gemini_client is None:
@@ -1618,70 +1618,6 @@ def save_chatbot():
         # Logging: Log exceptions
         logging.error(f"Error saving chatbot: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
-
-# # --- Save chat config ---
-# @main_bp.route('/save_chat_config', methods=['POST'])
-# def save_chat_config():
-#     try:
-#         data = request.form
-#         conn = sqlite3.connect(DB_FILE)
-#         cursor = conn.cursor()
-#         cursor.execute("""
-#             INSERT INTO chat_configs (
-#                 data_source, gemini_api_key, gemini_model, sheet_id, service_account_json,
-#                 db_host, db_port, db_name, db_username, db_password, selected_sheets, selected_tables,
-#                 neo4j_uri, neo4j_db_name, neo4j_username, neo4j_password, mongo_uri, mongo_db_name,
-#                 airtable_api_key, airtable_base_id, databricks_hostname, databricks_http_path, databricks_token,
-#                 supabase_url, supabase_anon_key, snowflake_account, snowflake_user, snowflake_password,
-#                 snowflake_warehouse, snowflake_database, snowflake_schema, snowflake_role,
-#                 odoo_url, odoo_db, odoo_username, odoo_password, selected_module
-#             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-#         """, (
-#             data.get('data_source'),
-#             data.get('gemini_api_key'),
-#             data.get('gemini_model'),
-#             data.get('sheet_id'),
-#             data.get('service_account_json'),
-#             data.get('db_host'),
-#             data.get('db_port'),
-#             data.get('db_name'),
-#             data.get('db_username'),
-#             data.get('db_password'),
-#             data.get('selected_sheets'),
-#             data.get('selected_tables'),
-#             data.get('neo4j_uri'),
-#             data.get('neo4j_db_name'),
-#             data.get('neo4j_username'),
-#             data.get('neo4j_password'),
-#             data.get('mongo_uri'),
-#             data.get('mongo_db_name'),
-#             data.get('airtable_api_key'),
-#             data.get('airtable_base_id'),
-#             data.get('databricks_hostname'),
-#             data.get('databricks_http_path'),
-#             data.get('databricks_token'),
-#             data.get('supabase_url'),
-#             data.get('supabase_anon_key'),
-#             data.get('snowflake_account'),
-#             data.get('snowflake_user'),
-#             data.get('snowflake_password'),
-#             data.get('snowflake_warehouse'),
-#             data.get('snowflake_database'),
-#             data.get('snowflake_schema'),
-#             data.get('snowflake_role'),
-#             data.get('odoo_url'),
-#             data.get('odoo_db'),
-#             data.get('odoo_username'),
-#             data.get('odoo_password'),
-#             data.get('selected_module')
-#         ))
-#         config_id = cursor.lastrowid
-#         conn.commit()
-#         conn.close()
-#         return jsonify({"config_id": config_id})
-#     except Exception as e:
-#         logging.error(f"Error saving chat config: {str(e)}")
-#         return jsonify({"success": False, "message": str(e)}), 500
 
 # --- Check chatbot count for restrictions ---
 @main_bp.route('/check_chatbot_count', methods=['GET'])

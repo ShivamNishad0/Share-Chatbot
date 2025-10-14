@@ -889,7 +889,27 @@
             const p = document.createElement('p');
             p.className = 'message ' + sender;
             if (sender === 'bot') {
-                p.innerHTML = text; // Render HTML for bot responses
+                // Check if response is wrapped in markdown code block
+                if (text.startsWith('```html') && text.endsWith('```')) {
+                    text = text.slice(7, -3); // Remove ```html and ```
+                }
+                // Create a temporary div to parse the HTML and extract scripts
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = text;
+                const scripts = Array.from(tempDiv.querySelectorAll('script'));
+                // Remove scripts from the HTML content
+                scripts.forEach(script => script.remove());
+                p.innerHTML = tempDiv.innerHTML; // Render HTML without scripts
+                // Execute scripts after Google Charts is loaded
+                if (scripts.length > 0 && typeof google !== 'undefined' && google.charts) {
+                    google.charts.setOnLoadCallback(() => {
+                        scripts.forEach(script => {
+                            const newScript = document.createElement('script');
+                            newScript.textContent = script.textContent;
+                            document.head.appendChild(newScript);
+                        });
+                    });
+                }
             } else {
                 p.textContent = text;
             }
