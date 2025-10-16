@@ -1974,29 +1974,7 @@ def shared_chatbot(share_key):
                 document.getElementById('user_input').value = message;
                 sendMessage();
             }}
-
-            // Emoji picker functionality
-            document.getElementById('emojiBtn').addEventListener('click', function() {{
-                const picker = document.getElementById('emojiPicker');
-                picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
-            }});
-
-            document.getElementById('emojiGrid').addEventListener('click', function(e) {{
-                if (e.target.classList.contains('emoji')) {{
-                    document.getElementById('user_input').value += e.target.textContent;
-                    document.getElementById('emojiPicker').style.display = 'none';
-                }}
-            }});
-
-            // Close emoji picker when clicking outside
-            document.addEventListener('click', function(e) {{
-                const picker = document.getElementById('emojiPicker');
-                const btn = document.getElementById('emojiBtn');
-                if (!picker.contains(e.target) && e.target !== btn) {{
-                    picker.style.display = 'none';
-                }}
-            }});
-
+            
             // Enter key to send
             document.getElementById('user_input').addEventListener('keydown', function(e) {{
                 if (e.key === 'Enter') {{
