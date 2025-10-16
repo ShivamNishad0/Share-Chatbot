@@ -22,6 +22,8 @@ from app.services.database_service import DatabaseService
 import re
 import requests
 from google.auth.transport.requests import Request
+import os
+from werkzeug.utils import secure_filename
 
 # System instruction for BI tool
 system_instruction = """You are a generative BI (Business Intelligence) tool. Your purpose is to create components based on user prompts and provided data.
@@ -1454,6 +1456,20 @@ def save_chatbot():
                 logging.error(f"Missing required field: {field}")
                 return jsonify({"success": False, "message": f"{field} is required"}), 400
 
+        # Handle logo upload
+        company_logo_path = None
+        if 'company_logo' in request.files:
+            logo_file = request.files['company_logo']
+            if logo_file and logo_file.filename:
+                # Secure the filename
+                filename = secure_filename(logo_file.filename)
+                # Generate unique filename to avoid conflicts
+                unique_filename = secrets.token_hex(8) + '_' + filename
+                upload_path = os.path.join('static', 'uploads', unique_filename)
+                logo_file.save(upload_path)
+                company_logo_path = f'/static/uploads/{unique_filename}'
+                logging.info(f"Logo uploaded to: {upload_path}")
+
         username = data['username']
         data_source = data.get('data_source')
 
@@ -1596,7 +1612,7 @@ def save_chatbot():
             'odoo_password': data.get('odoo_password'),
             'selected_module': data.get('selected_module'),
             'share_key': share_key,
-            'company_logo': data.get('company_logo'),
+            'company_logo': company_logo_path or data.get('company_logo'),
             'nav_color': data.get('nav_color'),
             'text_color': data.get('text_color'),
             'content_bg_color': data.get('content_bg_color'),
@@ -1680,6 +1696,12 @@ def shared_chatbot(share_key):
         'company_logo': cb.get('company_logo', '')
     }
 
+    # Placeholders to avoid f-string interpolation issues with JavaScript template literals
+    sender_placeholder = "${sender}"
+    text_placeholder = "${text}"
+    getCurrentTime_placeholder = "${getCurrentTime()}"
+    API_BASE_placeholder = "${API_BASE}"
+
     html = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -1687,30 +1709,189 @@ def shared_chatbot(share_key):
         <meta charset="UTF-8">
         <title>{cb['chatbot_name']}</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <style>
             body {{
-                background-color: {styles['content_bg_color']};
+                background: linear-gradient(135deg, {styles['content_bg_color']} 0%, #f8f9fa 100%);
                 color: {styles['text_color']};
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                min-height: 100vh;
             }}
             .navbar {{
-                background-color: {styles['nav_color']} !important;
+                background: linear-gradient(90deg, {styles['nav_color']} 0%, #0056b3 100%) !important;
                 border-bottom: {styles['nav_border_thickness']} solid {styles['nav_border_color']} !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }}
             .chat-container {{
                 border: {styles['border_thickness']} solid {styles['border_color']};
-                border-radius: 5px;
-                padding: 20px;
+                border-radius: 15px;
+                padding: 25px;
                 margin-top: 20px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
             }}
             .form-control {{
                 background-color: {styles['textarea_color']} !important;
                 border-color: {styles['textarea_border_color']} !important;
                 border-width: {styles['textarea_border_thickness']} !important;
+                border-radius: 25px !important;
+                padding: 12px 20px;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
             }}
             .btn-primary {{
-                background-color: {styles['button_color']} !important;
+                background: linear-gradient(45deg, {styles['button_color']} 0%, #0056b3 100%) !important;
                 border-color: {styles['button_color']} !important;
                 color: {styles['button_text_color']} !important;
+                border-radius: 25px !important;
+                padding: 12px 30px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            }}
+            .btn-primary:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+            }}
+            #chat {{
+                height: 400px;
+                overflow-y: auto;
+                border: 1px solid rgba(0,0,0,0.1);
+                padding: 20px;
+                border-radius: 10px;
+                background: rgba(248, 249, 250, 0.5);
+                backdrop-filter: blur(5px);
+            }}
+            .message {{
+                margin-bottom: 15px;
+                padding: 12px 16px;
+                border-radius: 18px;
+                max-width: 70%;
+                animation: fadeIn 0.5s ease-in;
+                position: relative;
+            }}
+            .message.user {{
+                background: linear-gradient(135deg, {styles['button_color']} 0%, #0056b3 100%);
+                color: black;
+                margin-left: auto;
+                text-align: right;
+                box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+            }}
+            .message.bot {{
+                background: rgba(255, 255, 255, 0.9);
+                color: #333;
+                margin-right: auto;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }}
+            .timestamp {{
+                font-size: 0.75rem;
+                opacity: 0.7;
+                margin-top: 5px;
+            }}
+            .typing-indicator {{
+                display: none;
+                padding: 12px 16px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 18px;
+                margin-right: auto;
+                max-width: 70%;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }}
+            .typing-dots {{
+                display: flex;
+                gap: 4px;
+            }}
+            .typing-dot {{
+                width: 8px;
+                height: 8px;
+                background: #007bff;
+                border-radius: 50%;
+                animation: typing 1.4s infinite ease-in-out;
+            }}
+            .typing-dot:nth-child(2) {{ animation-delay: 0.2s; }}
+            .typing-dot:nth-child(3) {{ animation-delay: 0.4s; }}
+            .quick-replies {{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 10px;
+            }}
+            .quick-reply-btn {{
+                background: rgba(0, 123, 255, 0.1);
+                border: 1px solid rgba(0, 123, 255, 0.3);
+                color: #007bff;
+                border-radius: 20px;
+                padding: 6px 12px;
+                font-size: 0.85rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }}
+            .quick-reply-btn:hover {{
+                background: rgba(0, 123, 255, 0.2);
+                transform: scale(1.05);
+            }}
+            .emoji-btn {{
+                background: transparent;
+                border: none;
+                color: #6c757d;
+                font-size: 1.2rem;
+                cursor: pointer;
+                margin-right: 10px;
+                transition: color 0.2s ease;
+            }}
+            .emoji-btn:hover {{
+                color: #007bff;
+            }}
+            .emoji-picker {{
+                display: none;
+                position: absolute;
+                bottom: 60px;
+                left: 0;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                padding: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                max-width: 300px;
+                z-index: 1000;
+            }}
+            .emoji-grid {{
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                gap: 5px;
+            }}
+            .emoji {{
+                cursor: pointer;
+                font-size: 1.5rem;
+                padding: 5px;
+                border-radius: 5px;
+                transition: background 0.2s ease;
+            }}
+            .emoji:hover {{
+                background: rgba(0,123,255,0.1);
+            }}
+            @keyframes fadeIn {{
+                from {{ opacity: 0; transform: translateY(10px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            @keyframes typing {{
+                0%, 60%, 100% {{ transform: translateY(0); }}
+                30% {{ transform: translateY(-10px); }}
+            }}
+            @media (max-width: 768px) {{
+                .chat-container {{
+                    margin: 10px;
+                    padding: 15px;
+                }}
+                #chat {{
+                    height: 300px;
+                }}
+                .message {{
+                    max-width: 85%;
+                }}
             }}
         </style>
     </head>
@@ -1718,39 +1899,157 @@ def shared_chatbot(share_key):
         <nav class="navbar navbar-expand-lg">
             <div class="container">
                 {f'<img src="{styles["company_logo"]}" alt="Logo" style="height: 40px; margin-right: 10px;">' if styles['company_logo'] else ''}
-                <span class="navbar-brand">{cb['chatbot_name']}</span>
+                <span class="navbar-brand fw-bold">{cb['chatbot_name']}</span>
             </div>
         </nav>
-        <div class="container">
+        <div class="container-fluid">
             <div class="chat-container">
-                <h4>Chat with {cb['chatbot_name']}</h4>
-                <div id="chat" class="mb-3" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
-                <div class="input-group">
-                    <input type="text" id="user_input" class="form-control" placeholder="Ask about your data...">
-                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                <h4 class="text-center mb-4"><i class="fas fa-robot me-2"></i>Chat with {cb['chatbot_name']}</h4>
+                <div id="chat" class="mb-3">
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quick-replies" id="quickReplies">
+                    <button class="quick-reply-btn" onclick="sendQuickReply('Hello')">Hello</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('Show me the data')">Show data</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('Help')">Help</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('What can you do?')">What can you do?</button>
+                </div>
+                <div class="input-group mt-3">
+                    <button class="emoji-btn" id="emojiBtn" title="Add emoji"><i class="fas fa-smile"></i></button>
+                    <input type="text" id="user_input" class="form-control" placeholder="Ask about your data..." autocomplete="off">
+                    <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn"><i class="fas fa-paper-plane me-1"></i>Send</button>
+                </div>
+                <div class="emoji-picker" id="emojiPicker">
+                    <div class="emoji-grid" id="emojiGrid">
+                        😀 😃 😄 😁 😆 😅 😂 🤣 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🤭 🤫 🤥 😶 😐 😑 😬 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠 😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃 😺 😸 😹 😻 😼 😽 🙀 😿 😾
+                    </div>
                 </div>
             </div>
         </div>
         <script>
             const API_BASE = window.location.origin;
             const shareKey = "{share_key}";
+            let isTyping = false;
+
+            function getCurrentTime() {{
+                return new Date().toLocaleTimeString([], {{hour: '2-digit', minute:'2-digit'}});
+            }}
+
+            function appendMessage(sender, text) {{
+                const chatDiv = document.getElementById('chat');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message {sender_placeholder}`;
+                messageDiv.innerHTML = `<div>{text_placeholder}</div><div class="timestamp">{getCurrentTime_placeholder}</div>`;
+                chatDiv.appendChild(messageDiv);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }}
+
+            function showTypingIndicator() {{
+                if (!isTyping) {{
+                    isTyping = true;
+                    const chatDiv = document.getElementById('chat');
+                    const typingDiv = document.getElementById('typingIndicator');
+                    chatDiv.appendChild(typingDiv);
+                    typingDiv.style.display = 'block';
+                    chatDiv.scrollTop = chatDiv.scrollHeight;
+                }}
+            }}
+
+            function hideTypingIndicator() {{
+                if (isTyping) {{
+                    isTyping = false;
+                    document.getElementById('typingIndicator').style.display = 'none';
+                }}
+            }}
 
             async function sendMessage() {{
-                const input = document.getElementById('user_input').value;
-                if(!input) return;
-                const chatDiv = document.getElementById('chat');
-                chatDiv.innerHTML += `<p class="user"><b>You:</b> ${{input}}</p>`;
+                const input = document.getElementById('user_input');
+                const sendBtn = document.getElementById('sendBtn');
+                const message = input.value.trim();
+                if(!message) return;
 
-                const res = await fetch(`${{API_BASE}}/chat`, {{
-                    method:'POST',
-                    headers:{{'Content-Type':'application/json'}},
-                    body: JSON.stringify({{message: input, share_key: shareKey}})
-                }});
-                const data = await res.json();
-                chatDiv.innerHTML += `<p class="bot"><b>Bot:</b> ${{data.response}}</p>`;
-                chatDiv.scrollTop = chatDiv.scrollHeight;
-                document.getElementById('user_input').value = '';
+                appendMessage('user', message);
+                input.value = '';
+                sendBtn.disabled = true;
+                showTypingIndicator();
+
+                try {{
+                    const res = await fetch(`{API_BASE_placeholder}/chat`, {{
+                        method:'POST',
+                        headers:{{'Content-Type':'application/json'}},
+                        body: JSON.stringify({{message: message, share_key: shareKey}})
+                    }});
+                    const data = await res.json();
+                    hideTypingIndicator();
+                    const text = data.response;
+                    if(text.startsWith('```html') && text.endsWith('```')){{
+                        const htmlContent = text.slice(7, -3).trim();
+                        const iframe = document.createElement('iframe');
+                        iframe.style.width = '100%';
+                        iframe.style.height = '400px';
+                        iframe.style.border = '1px solid #ddd';
+                        iframe.srcdoc = htmlContent;
+                        const chatDiv = document.getElementById('chat');
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message bot';
+                        messageDiv.innerHTML = `<div></div><div class="timestamp">{getCurrentTime_placeholder}</div>`;
+                        messageDiv.appendChild(iframe);
+                        chatDiv.appendChild(messageDiv);
+                        chatDiv.scrollTop = chatDiv.scrollHeight;
+                    }} else {{
+                        appendMessage('bot', text);
+                    }}
+                }} catch(e) {{
+                    hideTypingIndicator();
+                    appendMessage('bot', 'Sorry, there was an error. Please try again.');
+                }} finally {{
+                    sendBtn.disabled = false;
+                }}
             }}
+
+            function sendQuickReply(message) {{
+                document.getElementById('user_input').value = message;
+                sendMessage();
+            }}
+
+            // Emoji picker functionality
+            document.getElementById('emojiBtn').addEventListener('click', function() {{
+                const picker = document.getElementById('emojiPicker');
+                picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
+            }});
+
+            document.getElementById('emojiGrid').addEventListener('click', function(e) {{
+                if (e.target.classList.contains('emoji')) {{
+                    document.getElementById('user_input').value += e.target.textContent;
+                    document.getElementById('emojiPicker').style.display = 'none';
+                }}
+            }});
+
+            // Close emoji picker when clicking outside
+            document.addEventListener('click', function(e) {{
+                const picker = document.getElementById('emojiPicker');
+                const btn = document.getElementById('emojiBtn');
+                if (!picker.contains(e.target) && e.target !== btn) {{
+                    picker.style.display = 'none';
+                }}
+            }});
+
+            // Enter key to send
+            document.getElementById('user_input').addEventListener('keydown', function(e) {{
+                if (e.key === 'Enter') {{
+                    e.preventDefault();
+                    sendMessage();
+                }}
+            }});
+
+            // Initial focus
+            document.getElementById('user_input').focus();
         </script>
     </body>
     </html>

@@ -1,11 +1,11 @@
 <?php
-// Public chat interface page with invisible button and modal configuration form
+// Admin config page with invisible button and modal configuration form
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Chatbot Interface</title>
+    <title>Admin config</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         body {
@@ -136,6 +136,10 @@
                         <option value="gemini-2.0-flash" selected>gemini-2.0-flash</option>
                     </select>
                 </div>
+                <div class="mb-3">
+                    <label for="companyLogo" class="form-label">Company Logo (optional)</label>
+                    <input type="file" class="form-control" id="companyLogo" accept="image/*" />
+                </div>
 
                 <!-- Credential fields container -->
                 <div id="credentialFields"></div>
@@ -169,7 +173,7 @@
     <div id="chatContainer" class="d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 id="chatTitle" class="mb-0"></h4>
-            <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄</button>
+            <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
         </div>
         <div id="chatMessages"></div>
         <div class="input-group">
@@ -629,6 +633,12 @@
             formData.append('gemini_model', geminiModel);
             formData.append('selected_tables', JSON.stringify(selectedTables));
 
+            // Handle logo upload
+            const logoFile = document.getElementById('companyLogo').files[0];
+            if (logoFile) {
+                formData.append('company_logo', logoFile);
+            }
+
             // Debug: Log formData contents
             console.log('FormData contents:');
             for (let [key, value] of formData.entries()) {
@@ -879,7 +889,8 @@
         if(urlShareKey) {
             shareKey = urlShareKey;
             configured = true;
-            chatTitle.textContent = 'Shared Chatbot';
+            document.title = 'User view';
+            chatTitle.textContent = 'User View';
             chatMessages.innerHTML = '';
             chatContainer.style.display = 'flex';
             configModal.hide();

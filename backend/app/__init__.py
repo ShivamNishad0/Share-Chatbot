@@ -9,6 +9,10 @@ def create_app():
     # Load configuration
     app.config.from_object('config.Config')
 
+    # Configure static folder for uploads
+    app.static_folder = 'static'
+    app.static_url_path = '/static'
+
     # Import and register blueprints
     from .routes import main_bp
     app.register_blueprint(main_bp)
