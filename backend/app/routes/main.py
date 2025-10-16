@@ -1833,46 +1833,7 @@ def shared_chatbot(share_key):
                 background: rgba(0, 123, 255, 0.2);
                 transform: scale(1.05);
             }}
-            .emoji-btn {{
-                background: transparent;
-                border: none;
-                color: #6c757d;
-                font-size: 1.2rem;
-                cursor: pointer;
-                margin-right: 10px;
-                transition: color 0.2s ease;
-            }}
-            .emoji-btn:hover {{
-                color: #007bff;
-            }}
-            .emoji-picker {{
-                display: none;
-                position: absolute;
-                bottom: 60px;
-                left: 0;
-                background: white;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                padding: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                max-width: 300px;
-                z-index: 1000;
-            }}
-            .emoji-grid {{
-                display: grid;
-                grid-template-columns: repeat(8, 1fr);
-                gap: 5px;
-            }}
-            .emoji {{
-                cursor: pointer;
-                font-size: 1.5rem;
-                padding: 5px;
-                border-radius: 5px;
-                transition: background 0.2s ease;
-            }}
-            .emoji:hover {{
-                background: rgba(0,123,255,0.1);
-            }}
+
             @keyframes fadeIn {{
                 from {{ opacity: 0; transform: translateY(10px); }}
                 to {{ opacity: 1; transform: translateY(0); }}
@@ -1915,21 +1876,17 @@ def shared_chatbot(share_key):
                     </div>
                 </div>
                 <div class="quick-replies" id="quickReplies">
-                    <button class="quick-reply-btn" onclick="sendQuickReply('Hello')">Hello</button>
+                    <button class="quick-reply-btn" onclick="sendQuickReply('Dashboard')">Dashboard</button>
                     <button class="quick-reply-btn" onclick="sendQuickReply('Show me the data')">Show data</button>
                     <button class="quick-reply-btn" onclick="sendQuickReply('Help')">Help</button>
                     <button class="quick-reply-btn" onclick="sendQuickReply('What can you do?')">What can you do?</button>
                 </div>
                 <div class="input-group mt-3">
-                    <button class="emoji-btn" id="emojiBtn" title="Add emoji"><i class="fas fa-smile"></i></button>
+
                     <input type="text" id="user_input" class="form-control" placeholder="Ask about your data..." autocomplete="off">
                     <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn"><i class="fas fa-paper-plane me-1"></i>Send</button>
                 </div>
-                <div class="emoji-picker" id="emojiPicker">
-                    <div class="emoji-grid" id="emojiGrid">
-                        😀 😃 😄 😁 😆 😅 😂 🤣 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🤭 🤫 🤥 😶 😐 😑 😬 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠 😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃 😺 😸 😹 😻 😼 😽 🙀 😿 😾
-                    </div>
-                </div>
+
             </div>
         </div>
         <script>
