@@ -42,16 +42,45 @@
             border-radius: 4px;
             background: #fefefe;
         }
-        .message.user {
-            text-align: right;
-            color: #007bff;
-            margin-bottom: 8px;
-        }
-        .message.bot {
-            text-align: left;
-            color: #333;
-            margin-bottom: 8px;
-        }
+        .message {
+        margin-bottom: 10px;
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 70%;
+        width: fit-content;
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: pre-wrap;
+        animation: fadeIn 0.5s ease-in;
+        position: relative;
+    }
+
+    .message.user {
+        background: linear-gradient(135deg, <?php echo $button_color; ?> 0%, #0056b3 100%);
+        color: black;
+        margin-left: auto;
+        text-align: right;
+        box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+    }
+
+    .message.bot {
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        margin-right: auto;
+        text-align: left;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .timestamp {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
         #tableSelection {
             max-height: 150px;
             overflow-y: auto;
@@ -60,12 +89,12 @@
             border-radius: 4px;
         }
         #micBtn {
-            background-color: #6c757d;
-            border-color: #6c757d;
+            background-color: transparent;
+            border-color: transparent;
         }
         #micBtn.recording {
-            background-color: red;
-            border-color: red;
+            background-color: transparent;
+            border-color: transparent;
             color: white;
         }
         #refreshBtn {
@@ -75,6 +104,28 @@
         }
         #refreshBtn:hover {
             background: rgba(108, 117, 125, 0.1);
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .loading-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes loading {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
         }
     </style>
 </head>
@@ -178,7 +229,7 @@
         <div id="chatMessages"></div>
         <div class="input-group">
             <input type="text" id="userInput" class="form-control" placeholder="Ask your chatbot..." autocomplete="off" />
-            <button class="btn btn-secondary" id="micBtn">🎤</button>
+            <button class="btn btn-secondary" id="micBtn">🎙️</button>
             <button class="btn btn-primary" id="sendBtn">Send</button>
         </div>
     </div>
@@ -213,6 +264,7 @@
         let shareKey = null;
         let recognition;
         let isRecording = false;
+        let isLoading = false;
 
         // Speech Recognition setup
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -228,7 +280,7 @@
             recognition.onend = () => {
                 isRecording = false;
                 micBtn.classList.remove('recording');
-                micBtn.textContent = '🎤';
+                micBtn.textContent = '🎙️';
             };
         } else {
             micBtn.disabled = true;
@@ -795,7 +847,7 @@
                 recognition.start();
                 isRecording = true;
                 micBtn.classList.add('recording');
-                micBtn.textContent = '🔴';
+                micBtn.textContent = '🎙️';
             }
         });
 
@@ -803,6 +855,35 @@
             chatMessages.innerHTML = '';
             appendMessage('bot', 'Chat refreshed. Start a new conversation!');
         });
+
+        function showLoading() {
+            if (isLoading) return;
+            isLoading = true;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message bot loading';
+            loadingDiv.innerHTML = `
+                <div class="loading-dots">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            `;
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            sendBtn.disabled = true;
+            userInput.disabled = true;
+        }
+
+        function hideLoading() {
+            if (!isLoading) return;
+            isLoading = false;
+            const loadingMessage = chatMessages.querySelector('.loading');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+            sendBtn.disabled = false;
+            userInput.disabled = false;
+        }
 
         async function sendMessage() {
             if(!configured) {
@@ -814,6 +895,7 @@
 
             appendMessage('user', message);
             userInput.value = '';
+            showLoading();
 
             const payload = {message: message};
             if(shareKey) {
@@ -829,12 +911,15 @@
                     body: JSON.stringify(payload)
                 });
                 if(!response.ok) {
+                    hideLoading();
                     appendMessage('bot', 'Error: Failed to get response from server.');
                     return;
                 }
                 const data = await response.json();
+                hideLoading();
                 appendMessage('bot', data.response);
             } catch(e) {
+                hideLoading();
                 appendMessage('bot', 'Error: ' + e.message);
             }
         }
@@ -896,6 +981,10 @@
             configModal.hide();
         }
 
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
         function appendMessage(sender, text) {
             const p = document.createElement('p');
             p.className = 'message ' + sender;
@@ -924,6 +1013,10 @@
             } else {
                 p.textContent = text;
             }
+            const timestamp = document.createElement('div');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = getCurrentTime();
+            p.appendChild(timestamp);
             chatMessages.appendChild(p);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }

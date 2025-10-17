@@ -419,156 +419,7 @@ def send_reset_email(username, reset_token, frontend_url=None):
         logging.error(f"Failed to send password reset email: {str(e)}")
         return False
 
-# --- Signup ---
-@main_bp.route('/signup', methods=['POST'])
-def signup():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
-    accepted_terms = data.get('accepted_terms', False)
-    accepted_privacy = data.get('accepted_privacy', False)
 
-    if not username or not password:
-        return jsonify({"success": False, "message": "Username and password required"}), 400
-
-    if not accepted_terms or not accepted_privacy:
-        return jsonify({"success": False, "message": "You must accept both Terms & Conditions and Privacy Policy"}), 400
-
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    # Check if user already exists
-    cursor.execute("SELECT * FROM users WHERE username=?", (username,))
-    if cursor.fetchone():
-        conn.close()
-        return jsonify({"success": False, "message": "User already exists"}), 400
-
-    # Insert user
-    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
-
-    # Insert agreement records with timestamps
-    from datetime import datetime
-    current_time = datetime.now().isoformat()
-
-    cursor.execute("""
-        INSERT INTO user_agreements (username, accepted_terms, accepted_privacy, terms_timestamp, privacy_timestamp)
-        VALUES (?, ?, ?, ?, ?)
-    """, (username, accepted_terms, accepted_privacy, current_time, current_time))
-
-    conn.commit()
-    conn.close()
-    return jsonify({"success": True})
-
-# --- Login ---
-@main_bp.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
-    if cursor.fetchone():
-        conn.close()
-        return jsonify({"success": True})
-    conn.close()
-    return jsonify({"success": False, "message": "Invalid credentials"}), 400
-
-# --- Forgot Password ---
-@main_bp.route('/forgot-password', methods=['POST'])
-def forgot_password():
-    data = request.json
-    username = data.get('username')
-
-    if not username:
-        return jsonify({"success": False, "message": "Username is required"}), 400
-
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    # Check if user exists
-    cursor.execute("SELECT * FROM users WHERE username=?", (username,))
-    if not cursor.fetchone():
-        conn.close()
-        return jsonify({"success": False, "message": "User not found"}), 404
-
-    # Clean up expired tokens
-    cursor.execute("DELETE FROM password_resets WHERE expires_at < ?", (datetime.now().isoformat(),))
-
-    # Generate new token
-    reset_token = generate_reset_token()
-
-    # Set expiration time (24 hours from now)
-    expires_at = datetime.now() + timedelta(hours=24)
-
-    # Insert new token
-    cursor.execute("""
-        INSERT INTO password_resets (username, token, expires_at, used)
-        VALUES (?, ?, ?, ?)
-    """, (username, reset_token, expires_at.isoformat(), False))
-
-    conn.commit()
-    conn.close()
-
-    # Send email
-    email_sent = send_reset_email(username, reset_token)
-
-    if email_sent:
-        return jsonify({"success": True, "message": "Password reset instructions sent to your email"})
-    else:
-        return jsonify({"success": False, "message": "Failed to send email. Please try again later."}), 500
-
-# --- Reset Password ---
-@main_bp.route('/reset-password', methods=['POST'])
-def reset_password():
-    data = request.json
-    token = data.get('token')
-    new_password = data.get('new_password')
-
-    if not token or not new_password:
-        return jsonify({"success": False, "message": "Token and new password are required"}), 400
-
-    if len(new_password) < 6:
-        return jsonify({"success": False, "message": "Password must be at least 6 characters long"}), 400
-
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    # Check if token exists and is valid
-    cursor.execute("""
-        SELECT username, used, expires_at
-        FROM password_resets
-        WHERE token = ?
-    """, (token,))
-
-    result = cursor.fetchone()
-
-    if not result:
-        conn.close()
-        return jsonify({"success": False, "message": "Invalid or expired token"}), 400
-
-    username, used, expires_at = result
-
-    # Check if token is already used
-    if used:
-        conn.close()
-        return jsonify({"success": False, "message": "Token has already been used"}), 400
-
-    # Check if token is expired
-    if datetime.fromisoformat(expires_at) < datetime.now():
-        conn.close()
-        return jsonify({"success": False, "message": "Token has expired"}), 400
-
-    # Update password
-    cursor.execute("UPDATE users SET password = ? WHERE username = ?", (new_password, username))
-
-    # Mark token as used
-    cursor.execute("UPDATE password_resets SET used = 1 WHERE token = ?", (token,))
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({"success": True, "message": "Password reset successfully"})
 
 # --- Set credentials and list items ---
 @main_bp.route('/set_credentials', methods=['POST'])
@@ -1770,6 +1621,10 @@ def shared_chatbot(share_key):
                 padding: 12px 16px;
                 border-radius: 18px;
                 max-width: 70%;
+                width: fit-content;
+                word-wrap: break-word;
+                word-break: break-all;
+                white-space: pre-wrap;
                 animation: fadeIn 0.5s ease-in;
                 position: relative;
             }}
