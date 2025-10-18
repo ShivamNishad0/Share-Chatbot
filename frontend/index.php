@@ -42,6 +42,20 @@
             border-radius: 4px;
             background: #fefefe;
         }
+        .btn-light-green {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-light-green:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            color: white;
+        }
+        .text-green {
+            color: #28a745;
+        }
         .message {
         margin-bottom: 10px;
         padding: 12px 16px;
@@ -130,8 +144,23 @@
     </style>
 </head>
 <body>
+    <div class="d-flex align-items-center">
+        <img src="public/images/logo.png" alt="Logo" class="me-2 ms-2" style="height: 40px;">    
+        <h5 class="mb-0 fw-bold">SmartCard AI</h5>
+    </div>
+    <div style="border-bottom: 2px solid #28a745; width: 100%;"></div>
     <div id="invisibleButton" title="Click 15 times to configure chatbot"></div>
-    <button id="viewChatbotsBtn" class="btn btn-secondary mt-2">View My Chatbots</button>
+    <div class="text-center mb-4 mb-md-5 px-2 px-md-0">
+        <h1 class="display-3 display-md-1 fw-bold mb-4 mx-md-5 lh-base mt-4 mt-md-5">Generative BI Chatbot</h1>
+        <span class="text-green display-3 display-md-1 fw-bold mx-md-3 lh-base d-block">SmartCard AI</span>
+        <h2 class="text-muted fs-6 fs-sm-5">Build Business Intelligence Chatbots within Few Minutes</h2>
+        <!-- <p class="text-muted fs-6 fs-sm-5">Leverage Generative AI to Develop Business Intelligence Chatbots that Seamlessly Integrate with Your Data Sources.</p> -->
+    </div>
+    <div class="text-center mb-5">
+        <h2 class="fs-3 fs-md-2 fw-bold text-dark">Admin Config</h2>
+        <h3 class="fs-6 fs-md-7 text-secondary mt-1">Configure Your Chatbots</h3>
+    </div>
+    <button id="viewChatbotsBtn" class="btn btn-light-green mt-2">Saved Chatbots</button>
 
     <!-- Modal -->
     <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
@@ -257,8 +286,8 @@
         const micBtn = document.getElementById('micBtn');
         const refreshBtn = document.getElementById('refreshBtn');
 
-        const API_BASE = 'https://share-chatbot-2.onrender.com';
-        // const API_BASE = 'http://localhost:5001';
+        // const API_BASE = 'https://share-chatbot-2.onrender.com';
+        const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
