@@ -965,7 +965,7 @@
 
         function shareChatbot(shareKey, name) {
             const link = `${API_BASE}/shared/${shareKey}`;
-            const iframe = `<iframe src="${link}" width="600" height="500" frameborder="0"></iframe>`;
+            const iframe = `<iframe src="${link}" width="500" height="700" frameborder="0"></iframe>`;
             navigator.clipboard.writeText(iframe).then(() => alert('Iframe code copied to clipboard!'));
         }
 
