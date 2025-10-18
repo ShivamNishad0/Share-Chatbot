@@ -56,18 +56,21 @@
         .text-green {
             color: #28a745;
         }
+        .footer-green-bg {
+            background-color: #28a745;
+        }
         .message {
-        margin-bottom: 10px;
-        padding: 12px 16px;
-        border-radius: 18px;
-        max-width: 70%;
-        width: fit-content;
-        word-wrap: break-word;
-        word-break: break-all;
-        white-space: pre-wrap;
-        animation: fadeIn 0.5s ease-in;
-        position: relative;
-    }
+            margin-bottom: 10px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 70%;
+            width: fit-content;
+            word-wrap: break-word;
+            word-break: break-all;
+            white-space: pre-wrap;
+            animation: fadeIn 0.5s ease-in;
+            position: relative;
+        }
 
     .message.user {
         background: linear-gradient(135deg, <?php echo $button_color; ?> 0%, #0056b3 100%);
@@ -251,7 +254,7 @@
     </div>
 
     <!-- Chat Container -->
-    <div id="chatContainer" class="d-flex flex-column">
+    <div id="chatContainer" class="d-flex flex-column mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 id="chatTitle" class="mb-0"></h4>
             <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
@@ -260,10 +263,32 @@
         <div class="input-group">
             <input type="text" id="userInput" class="form-control" placeholder="Ask your chatbot..." autocomplete="off" />
             <button class="btn btn-secondary" id="micBtn">🎙️</button>
-            <button class="btn btn-primary" id="sendBtn">Send</button>
+            <button class="btn btn-primary " id="sendBtn">Send</button>
         </div>
     </div>
 
+    <!-- Footer -->
+    <div style="border-bottom: 2px solid #28a745; width: 100%;"></div>
+    <footer class="_footer_1dauh_1 **footer-green-bg**">
+        <div class="_container_1dauh_9">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                    <img alt="SmartCard Ai Logo" class="me-2" src="public/images/logo.png" style="height: 40px;">
+                    <span class="fs-5 fw-semibold">SmartCard Ai</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="https://in.linkedin.com/company/smartcard-ai" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                            <rect width="4" height="12" x="2" y="9"></rect>
+                            <circle cx="4" cy="4" r="2"></circle>
+                        </svg>
+                    </a>
+                    <span class="small">LinkedIn</span>
+                </div>
+            </div>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const invisibleButton = document.getElementById('invisibleButton');
