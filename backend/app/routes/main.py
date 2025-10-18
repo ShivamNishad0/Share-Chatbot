@@ -1688,7 +1688,18 @@ def shared_chatbot(share_key):
                 background: rgba(0, 123, 255, 0.2);
                 transform: scale(1.05);
             }}
-
+            .refreshBtn {{
+                position: absolute; /* or fixed if you want it on screen corner */
+                top: 10px;
+                right: 10px;
+                background: transparent !important;
+                border: transparent !important;
+                color: #000 !important;
+                cursor: pointer;
+            }}
+            .refreshBtn:hover {{
+                background: rgba(108, 117, 125, 0.1);
+            }}
             @keyframes fadeIn {{
                 from {{ opacity: 0; transform: translateY(10px); }}
                 to {{ opacity: 1; transform: translateY(0); }}
@@ -1719,31 +1730,40 @@ def shared_chatbot(share_key):
             </div>
         </nav>
         <div class="container-fluid">
-            <div class="chat-container">
-                <h4 class="text-center mb-4"><i class="fas fa-robot me-2"></i>Chat with {cb['chatbot_name']}</h4>
-                <div id="chat" class="mb-3">
-                    <div class="typing-indicator" id="typingIndicator">
-                        <div class="typing-dots">
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quick-replies" id="quickReplies">
-                    <button class="quick-reply-btn" onclick="sendQuickReply('Dashboard')">Dashboard</button>
-                    <button class="quick-reply-btn" onclick="sendQuickReply('Show me the data')">Show data</button>
-                    <button class="quick-reply-btn" onclick="sendQuickReply('Help')">Help</button>
-                    <button class="quick-reply-btn" onclick="sendQuickReply('What can you do?')">What can you do?</button>
-                </div>
-                <div class="input-group mt-3">
+    <div class="chat-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="m-0">
+                <i class="fas fa-robot me-2"></i>Chat with {cb['chatbot_name']}
+            </h4>
+            <button id="refreshBtn" class="btn btn-secondary btn-sm" type="button" title="Refresh Chat">🔄 Refresh</button>
+        </div>
 
-                    <input type="text" id="user_input" class="form-control" placeholder="Ask about your data..." autocomplete="off">
-                    <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn"><i class="fas fa-paper-plane me-1"></i>Send</button>
+        <div id="chat" class="mb-3">
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
                 </div>
-
             </div>
         </div>
+
+        <div class="quick-replies" id="quickReplies">
+            <button class="quick-reply-btn" onclick="sendQuickReply('Dashboard')">Dashboard</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Show me the data')">Show data</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Help')">Help</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('What can you do?')">What can you do?</button>
+        </div>
+
+        <div class="input-group mt-3">
+            <input type="text" id="user_input" class="form-control" placeholder="Ask about your data..." autocomplete="off">
+            <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn">
+                <i class="fas fa-paper-plane me-1"></i>Send
+            </button>
+        </div>
+    </div>
+</div>
+
         <script>
             const API_BASE = window.location.origin;
             const shareKey = "{share_key}";
@@ -1836,6 +1856,20 @@ def shared_chatbot(share_key):
                     e.preventDefault();
                     sendMessage();
                 }}
+            }});
+
+            // Refresh button functionality
+            document.getElementById('refreshBtn').addEventListener('click', () => {{
+                document.getElementById('chat').innerHTML = `
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                `;
+                appendMessage('bot', 'Chat refreshed. Start a new conversation!');
             }});
 
             // Initial focus

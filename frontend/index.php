@@ -221,6 +221,7 @@
       </div>
     </div>
 
+    <!-- Chat Container -->
     <div id="chatContainer" class="d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 id="chatTitle" class="mb-0"></h4>
