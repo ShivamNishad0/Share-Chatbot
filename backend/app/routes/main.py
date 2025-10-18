@@ -1688,6 +1688,14 @@ def shared_chatbot(share_key):
                 background: rgba(0, 123, 255, 0.2);
                 transform: scale(1.05);
             }}
+            .btn-transparent {{
+                background: transparent;
+                color: #6c757d;
+                border: none;
+            }}
+            .btn-transparent:hover {{
+                background: rgba(108, 117, 125, 0.1);
+            }}
             .refreshBtn {{
                 position: absolute; /* or fixed if you want it on screen corner */
                 top: 10px;
@@ -1735,7 +1743,7 @@ def shared_chatbot(share_key):
             <h4 class="m-0">
                 <i class="fas fa-robot me-2"></i>Chat with {cb['chatbot_name']}
             </h4>
-            <button id="refreshBtn" class="btn btn-secondary btn-sm" type="button" title="Refresh Chat">🔄 Refresh</button>
+            <button id="refreshBtn" class="btn btn-transparent btn-sm" type="button" title="Refresh Chat">🔄 Refresh</button>
         </div>
 
         <div id="chat" class="mb-3">
