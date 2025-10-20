@@ -145,47 +145,10 @@
             30% { transform: translateY(-10px); }
         }
 
-        #usernameInput {
-            position: relative;
-            background-color: white;
-        }
-
-        #usernameInput::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                transparent 48%, 
-                #28a745 50%, 
-                transparent 52%, 
-                transparent 100%
-            );
-            animation: runningLine 2s linear infinite;
-            pointer-events: none;
-            border-radius: 30px;
-        }
-
-        @keyframes runningLine {
-            0% {
-                left: -100%;
-            }
-            100% {
-                left: 100%;
-            }
-        }
-
-        #usernameInput:focus {
-            outline: none;
-            border-color: #28a745;
-        }
-
         .hover-shadow {
             transition: box-shadow 0.3s ease;
         }
+
         .hover-shadow:hover {
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
         }
@@ -215,6 +178,134 @@
             transform: translateY(0);
         }
 
+        .input-wrapper {
+            position: relative;
+            background-color: white;
+            border-radius: 30px;
+            padding: 3px;
+            background: linear-gradient(90deg, 
+                #e0e0e0 0%, 
+                #e0e0e0 25%, 
+                #28a745 50%, 
+                #e0e0e0 75%, 
+                #e0e0e0 100%
+            );
+            background-size: 200% 100%;
+            animation: movingBorder 3s linear infinite;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        @keyframes movingBorder {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 200% 0%;
+            }
+        }
+
+        .input-inner {
+            position: relative;
+            background-color: white;
+            border-radius: 27px;
+            overflow: hidden;
+        }
+
+        .floating-label {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: white;
+            padding: 0 5px;
+            color: #999;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            z-index: 3;
+        }
+
+        #usernameInput:focus {
+            outline: none;
+            box-shadow: none !important;
+        }
+
+        /* Float label when input is focused or has value */
+        #usernameInput:focus ~ .floating-label,
+        #usernameInput:not(:placeholder-shown) ~ .floating-label {
+            top: -1px;
+            font-size: 0px;
+            color: #28a745;
+            font-weight: 400;
+        }
+
+        /* Pause border animation and turn fully green when focused */
+        .input-wrapper:focus-within {
+            animation-play-state: paused;
+            background: linear-gradient(90deg, 
+                #28a745 0%, 
+                #28a745 100%
+            );
+        }
+
+        .chat-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .chat-input-wrapper input {
+      padding-right: 100px; /* space for buttons */
+      border-radius: 50px;
+      height: 45px;
+    }
+
+    .chat-input-wrapper .mic-btn,
+    .chat-input-wrapper .send-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      width: 70px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.1rem;
+    }
+
+    /* Mic button */
+    .chat-input-wrapper .mic-btn {
+      right: 55px;
+      background-color: #e9ecef;
+      color: #6c757d;
+    }
+
+    .chat-input-wrapper .mic-btn:hover {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    /* Send button */
+    .chat-input-wrapper .send-btn {
+      right: 10px;
+      background-color: #28a745;
+      color: #fff;
+      font-size: 1.2rem;
+    }
+
+    .chat-input-wrapper .send-btn:hover {
+      background-color: #218838;
+    }
+
+    /* Optional: input focus glow */
+    .chat-input-wrapper input:focus {
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+      border-color: #28a745;
+    }
+
     </style>
 </head>
 <body>
@@ -236,17 +327,22 @@
             <h3 class="fs-6 fs-md-7 text-secondary mt-1">Configure Your Chatbots</h3>
         </div>
         <div class="d-flex justify-content-center align-items-center mb-3" style="gap: 5px;">
-            <input 
-                type="text" 
-                id="usernameInput" 
-                class="form-control" 
-                placeholder="Admin Username" 
-                style="max-width: 600px; border-radius: 30px; padding: 15px 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" 
-            />
+            <div class="input-wrapper" style="max-width: 600px; width: 80%;">
+                <div class="input-inner" style="box-shadow: 0 2px 8px rgba(40,167,69,0.3); border-radius: 27px;">
+                    <input 
+                        type="text" 
+                        id="usernameInput" 
+                        class="form-control" 
+                        placeholder=" " 
+                        style="border-radius: 27px; padding: 15px 20px; padding-top: 20px; position: relative; z-index: 2; width: 100%; border: none; background-color: white; height: 48px;" 
+                    />
+                    <label for="usernameInput" class="floating-label">Admin Username</label>
+                </div>
+            </div>
             <button 
                 id="viewChatbotsBtn" 
                 class="btn" 
-                style="background: #28a745; color: white; border-radius: 30px; padding: 12px 35px; font-weight: 500; border: none; box-shadow: 0 2px 8px rgba(40,167,69,0.3);">
+                style="background: #28a745; color: white; border-radius: 30px; padding: 12px 35px; font-weight: 500; border: none; box-shadow: 0 2px 8px rgba(40,167,69,0.3); height: 51px; display: flex; align-items: center;">
                 See Chatbots
             </button>
         </div>
@@ -356,10 +452,10 @@
             <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
         </div>
         <div id="chatMessages"></div>
-        <div class="input-group">
-            <input type="text" id="userInput" class="form-control" placeholder="Ask your chatbot..." autocomplete="off" />
-            <button class="btn btn-secondary" id="micBtn">🎙️</button>
-            <button class="btn btn-primary " id="sendBtn">Send</button>
+        <div class="chat-input-wrapper">
+            <input type="text" id="userInput" class="form-control" placeholder="Ask your chatbot..." autocomplete="off">
+            <button class="mic-btn" id="micBtn">🎙️</button>
+            <button class="send-btn" id="sendBtn">Send</button>
         </div>
     </div>
     <?php endif; ?>
@@ -1096,21 +1192,58 @@
             const link = `${API_BASE}/shared/${shareKey}`;
             shareLinkInput.value = link;
             shareModal.show();
-            navigator.clipboard.writeText(link).then(() => {
-                alert('Share link copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
+
         }
 
-        copyShareLinkBtn.addEventListener('click', () => {
-            shareLinkInput.select();
-            navigator.clipboard.writeText(shareLinkInput.value).then(() => {
-                alert('Share link copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
+        function copyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyFeedback();
+                } else {
+                    throw new Error('Copy command was unsuccessful');
+                }
+            } catch (err) {
+                console.error('Copy failed: ', err);
+                alert('Failed to copy link. Please copy manually.');
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        copyShareLinkBtn.addEventListener('click', async () => {
+            const text = shareLinkInput.value;
+            if (navigator.clipboard) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    showCopyFeedback();
+                } catch (err) {
+                    console.error('Clipboard API failed: ', err);
+                    copyToClipboard(text);
+                }
+            } else {
+                copyToClipboard(text);
+            }
         });
+
+        function showCopyFeedback() {
+            const originalText = copyShareLinkBtn.textContent;
+            copyShareLinkBtn.textContent = 'Copied!';
+            copyShareLinkBtn.style.backgroundColor = '#6c757d';
+            copyShareLinkBtn.style.borderColor = '#6c757d';
+            setTimeout(() => {
+                copyShareLinkBtn.textContent = originalText;
+                copyShareLinkBtn.style.backgroundColor = '#28a745';
+                copyShareLinkBtn.style.borderColor = '#28a745';
+            }, 2000);
+        }
 
         // Check URL params for share_key
         const urlParams = new URLSearchParams(window.location.search);
