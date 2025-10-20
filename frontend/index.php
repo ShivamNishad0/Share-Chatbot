@@ -144,6 +144,44 @@
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-10px); }
         }
+
+        #usernameInput {
+            position: relative;
+            background-color: white;
+        }
+
+        #usernameInput::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                transparent 48%, 
+                #28a745 50%, 
+                transparent 52%, 
+                transparent 100%
+            );
+            animation: runningLine 2s linear infinite;
+            pointer-events: none;
+            border-radius: 30px;
+        }
+
+        @keyframes runningLine {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        #usernameInput:focus {
+            outline: none;
+            border-color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -154,16 +192,32 @@
     <div style="border-bottom: 2px solid #28a745; width: 100%;"></div>
     <div id="invisibleButton" title="Click 15 times to configure chatbot"></div>
     <div class="text-center mb-4 mb-md-5 px-2 px-md-0">
-        <h1 class="display-3 display-md-1 fw-bold mb-4 mx-md-5 lh-base mt-4 mt-md-5">Generative BI Chatbot</h1>
-        <span class="text-green display-3 display-md-1 fw-bold mx-md-3 lh-base d-block">SmartCard AI</span>
-        <h2 class="text-muted fs-6 fs-sm-5">Build Business Intelligence Chatbots within Few Minutes</h2>
+        <h1 id="mainH1" class="display-3 display-md-1 fw-bold mb-4 mx-md-5 lh-base mt-4 mt-md-5">Generative BI Chatbot</h1>
+        <span id="mainSpan" class="text-green display-3 display-md-1 fw-bold mx-md-3 lh-base d-block">SmartCard AI</span>
+        <h2 id="mainH2" class="text-muted fs-6 fs-sm-5">Build Business Intelligence Chatbots within Few Minutes</h2>
         <!-- <p class="text-muted fs-6 fs-sm-5">Leverage Generative AI to Develop Business Intelligence Chatbots that Seamlessly Integrate with Your Data Sources.</p> -->
     </div>
-    <div class="text-center mb-5">
-        <h2 class="fs-3 fs-md-2 fw-bold text-dark">Admin Config</h2>
-        <h3 class="fs-6 fs-md-7 text-secondary mt-1">Configure Your Chatbots</h3>
+    <div id="adminConfigSection">
+        <div class="text-center mb-5">
+            <h2 class="fs-3 fs-md-2 fw-bold text-dark">Admin Config</h2>
+            <h3 class="fs-6 fs-md-7 text-secondary mt-1">Configure Your Chatbots</h3>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mb-3" style="gap: 5px;">
+            <input 
+                type="text" 
+                id="usernameInput" 
+                class="form-control" 
+                placeholder="Admin Username" 
+                style="max-width: 600px; border-radius: 30px; padding: 15px 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" 
+            />
+            <button 
+                id="viewChatbotsBtn" 
+                class="btn" 
+                style="background: #28a745; color: white; border-radius: 30px; padding: 12px 35px; font-weight: 500; border: none; box-shadow: 0 2px 8px rgba(40,167,69,0.3);">
+                See Chatbots
+            </button>
+        </div>
     </div>
-    <button id="viewChatbotsBtn" class="btn btn-light-green mt-2">Saved Chatbots</button>
 
     <!-- Modal -->
     <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
@@ -238,25 +292,34 @@
       </div>
     </div>
 
-    <!-- Chatbots List Modal -->
-    <div class="modal fade" id="chatbotsModal" tabindex="-1" aria-labelledby="chatbotsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="chatbotsModalLabel">My Saved Chatbots</h5>
+            <h5 class="modal-title" id="shareModalLabel">Share Chatbot</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div id="chatbotsGrid" class="row"></div>
+            <p>Share this link:</p>
+            <input type="text" id="shareLinkInput" class="form-control" readonly />
+            <button class="btn btn-primary mt-2" id="copyShareLinkBtn">Copy Link</button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Chatbots Grid Container -->
+    <div id="chatbotsGridContainer" class="container mt-4" style="display: none;">
+        <h3 class="text-left mb-4">My Saved Chatbots</h3>
+        <div id="chatbotsGrid" class="row"></div>
+    </div>
+
+    <?php if (isset($_GET['share_key'])): ?>
     <!-- Chat Container -->
-    <div id="chatContainer" class="d-flex flex-column mb-4">
+    <div id="chatContainer" class="d-flex flex-column mb-4" style="display: flex;">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 id="chatTitle" class="mb-0"></h4>
+            <h4 id="chatTitle" class="mb-0">User Interface</h4>
             <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
         </div>
         <div id="chatMessages"></div>
@@ -266,34 +329,13 @@
             <button class="btn btn-primary " id="sendBtn">Send</button>
         </div>
     </div>
+    <?php endif; ?>
 
-    <!-- Footer -->
-    <div style="border-bottom: 2px solid #28a745; width: 100%;"></div>
-    <footer class="_footer_1dauh_1 **footer-green-bg**">
-        <div class="_container_1dauh_9">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div class="d-flex align-items-center mb-3 mb-md-0">
-                    <img alt="SmartCard Ai Logo" class="me-2" src="public/images/logo.png" style="height: 40px;">
-                    <span class="fs-5 fw-semibold">SmartCard Ai</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <a href="https://in.linkedin.com/company/smartcard-ai" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                            <rect width="4" height="12" x="2" y="9"></rect>
-                            <circle cx="4" cy="4" r="2"></circle>
-                        </svg>
-                    </a>
-                    <span class="small">LinkedIn</span>
-                </div>
-            </div>
-        </div>
-    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const invisibleButton = document.getElementById('invisibleButton');
         const configModal = new bootstrap.Modal(document.getElementById('configModal'));
-        const chatbotsModal = new bootstrap.Modal(document.getElementById('chatbotsModal'));
+        const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
         const configForm = document.getElementById('configForm');
         const chatbotIdInput = document.getElementById('chatbotId');
         const generateIdBtn = document.getElementById('generateIdBtn');
@@ -303,6 +345,7 @@
         const tableSelectionContainer = document.getElementById('tableSelectionContainer');
         const tableSelectionDiv = document.getElementById('tableSelection');
         const chatbotsGrid = document.getElementById('chatbotsGrid');
+        const chatbotsGridContainer = document.getElementById('chatbotsGridContainer');
         const chatContainer = document.getElementById('chatContainer');
         const chatTitle = document.getElementById('chatTitle');
         const chatMessages = document.getElementById('chatMessages');
@@ -355,7 +398,12 @@
         });
 
         viewChatbotsBtn.addEventListener('click', () => {
-            loadChatbots();
+            const username = usernameInput.value.trim();
+            if (!username) {
+                alert('Please enter a username.');
+                return;
+            }
+            loadChatbots(username);
         });
 
         dataSourceSelect.addEventListener('change', () => {
@@ -877,9 +925,6 @@
                 const data = await response.json();
                 shareKey = data.share_key;
                 configured = true;
-                chatTitle.textContent = `Chat with ${chatbotName}`;
-                chatMessages.innerHTML = '';
-                chatContainer.style.display = 'flex';
                 configModal.hide();
                 alert('Chatbot saved successfully! Share key: ' + shareKey);
             } catch(e) {
@@ -979,9 +1024,7 @@
             }
         }
 
-        async function loadChatbots() {
-            const username = prompt("Enter your username to load chatbots:");
-            if (!username) return;
+        async function loadChatbots(username) {
             try {
                 const response = await fetch(`${API_BASE}/list_chatbots?username=${encodeURIComponent(username)}`);
                 if (!response.ok) throw new Error('Failed to load');
@@ -989,39 +1032,52 @@
                 chatbotsGrid.innerHTML = '';
                 chatbots.forEach(cb => {
                     const col = document.createElement('div');
-                    col.className = 'col-md-6 mb-3';
+                    col.className = 'col-md-3 mb-3';
                     col.innerHTML = `
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">${cb.chatbot_name}</h5>
-                                <p class="card-text">Data Source: ${cb.data_source}</p>
-                                <button class="btn btn-primary me-2" onclick="loadChatbot('${cb.share_key}')">Load</button>
-                                <button class="btn btn-secondary" onclick="shareChatbot('${cb.share_key}', '${cb.chatbot_name}')">Share</button>
+                        <div class="card h-100 text-center">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                <div class="mb-3" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 123, 255, 0.1);">
+                                    <img src="public/images/${cb.data_source}.svg" alt="${cb.data_source}" style="width: 30px; height: 30px;">
+                                </div>
+                                <h5 class="card-title mb-3">${cb.chatbot_name}</h5>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary btn-sm" style="background-color: #28a745; border-color: #28a745;" onclick="loadChatbot('${cb.share_key}')">Load</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="shareChatbot('${cb.share_key}', '${cb.chatbot_name}')">Share</button>
+                                </div>
                             </div>
                         </div>
                     `;
                     chatbotsGrid.appendChild(col);
                 });
-                chatbotsModal.show();
+                chatbotsGridContainer.style.display = 'block';
             } catch(e) {
                 alert('Error loading chatbots: ' + e.message);
             }
         }
 
         function loadChatbot(shareKeyParam) {
-            shareKey = shareKeyParam;
-            configured = true;
-            chatTitle.textContent = 'Chat with Shared Bot';
-            chatMessages.innerHTML = '';
-            chatContainer.style.display = 'flex';
-            chatbotsModal.hide();
+            window.open('?share_key=' + shareKeyParam, '_blank');
         }
 
         function shareChatbot(shareKey, name) {
             const link = `${API_BASE}/shared/${shareKey}`;
-            const iframe = `<iframe src="${link}" width="500" height="700" frameborder="0"></iframe>`;
-            navigator.clipboard.writeText(iframe).then(() => alert('Iframe code copied to clipboard!'));
+            shareLinkInput.value = link;
+            shareModal.show();
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Share link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
         }
+
+        copyShareLinkBtn.addEventListener('click', () => {
+            shareLinkInput.select();
+            navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+                alert('Share link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        });
 
         // Check URL params for share_key
         const urlParams = new URLSearchParams(window.location.search);
@@ -1029,11 +1085,15 @@
         if(urlShareKey) {
             shareKey = urlShareKey;
             configured = true;
-            document.title = 'User view';
-            chatTitle.textContent = 'User View';
-            chatMessages.innerHTML = '';
-            chatContainer.style.display = 'flex';
+            document.title = 'User Interface';
             configModal.hide();
+            // Hide admin config section for user view
+            document.getElementById('adminConfigSection').style.display = 'none';
+            // Hide main headings and show user interface heading
+            document.getElementById('mainH1').style.display = 'none';
+            document.getElementById('mainSpan').remove();
+            document.getElementById('mainH2').remove();
+            document.getElementById('invisibleButton').remove();
         }
 
         function getCurrentTime() {
