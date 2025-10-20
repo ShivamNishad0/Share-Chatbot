@@ -182,6 +182,39 @@
             outline: none;
             border-color: #28a745;
         }
+
+        .hover-shadow {
+            transition: box-shadow 0.3s ease;
+        }
+        .hover-shadow:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .load-btn:hover {
+            background-color: #218838 !important;
+            border-color: #1e7e34 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background-color: #5a6268 !important;
+            border-color: #545b62 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .load-btn, .share-btn {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .load-btn:active, .share-btn:active {
+            transform: translateY(0);
+        }
+
     </style>
 </head>
 <body>
@@ -303,7 +336,7 @@
           <div class="modal-body">
             <p>Share this link:</p>
             <input type="text" id="shareLinkInput" class="form-control" readonly />
-            <button class="btn btn-primary mt-2" id="copyShareLinkBtn">Copy Link</button>
+            <button class="btn btn-primary mt-2" id="copyShareLinkBtn" style="background-color: #28a745; border-color: #28a745;">Copy Link</button>
           </div>
         </div>
       </div>
@@ -354,8 +387,8 @@
         const micBtn = document.getElementById('micBtn');
         const refreshBtn = document.getElementById('refreshBtn');
 
-        const API_BASE = 'https://share-chatbot-2.onrender.com';
-        // const API_BASE = 'http://localhost:5001';
+        // const API_BASE = 'https://share-chatbot-2.onrender.com';
+        const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
@@ -1034,15 +1067,15 @@
                     const col = document.createElement('div');
                     col.className = 'col-md-3 mb-3';
                     col.innerHTML = `
-                        <div class="card h-100 text-center">
+                        <div class="card h-100 text-center shadow-sm hover-shadow">
                             <div class="card-body d-flex flex-column align-items-center justify-content-center">
                                 <div class="mb-3" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 123, 255, 0.1);">
                                     <img src="public/images/${cb.data_source}.svg" alt="${cb.data_source}" style="width: 30px; height: 30px;">
                                 </div>
                                 <h5 class="card-title mb-3">${cb.chatbot_name}</h5>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-primary btn-sm" style="background-color: #28a745; border-color: #28a745;" onclick="loadChatbot('${cb.share_key}')">Load</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="shareChatbot('${cb.share_key}', '${cb.chatbot_name}')">Share</button>
+                                    <button class="btn btn-primary btn-sm load-btn" style="background-color: #28a745; border-color: #28a745;" onclick="loadChatbot('${cb.share_key}')">Load</button>
+                                    <button class="btn btn-secondary btn-sm share-btn" onclick="shareChatbot('${cb.share_key}', '${cb.chatbot_name}')">Share</button>
                                 </div>
                             </div>
                         </div>
