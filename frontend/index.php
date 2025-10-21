@@ -350,71 +350,84 @@
 
     <!-- Modal -->
     <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="border: 2px solid #28a745; border-radius: 15px; box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);">
+          <div class="modal-header" style="background: linear-gradient(90deg, #28a745 0%, #218838 100%); color: white; border-bottom: 2px solid #28a745;">
             <h5 class="modal-title" id="configModalLabel">Configure Chatbot</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" style="padding: 20px;">
             <form id="configForm">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" required />
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="username" class="form-label" style="color: #28a745; font-weight: 600;">Username</label>
+                        <input type="text" placeholder="Username" class="form-control" id="username" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="chatbotName" class="form-label" style="color: #28a745; font-weight: 600;">Chatbot Name</label>
+                        <input type="text" placeholder="Chatbot Name" class="form-control" id="chatbotName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="chatbotName" class="form-label">Chatbot Name</label>
-                    <input type="text" class="form-control" id="chatbotName" required />
+                    <!-- Company Logo Section -->
+                    <label class="form-label" style="color: #28a745; font-weight: 600;">Company Logo</label>
+                    <div id="logoPreview" style="width: 100%; height: 100px; border: 2px dashed #28a745; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(40, 167, 69, 0.1); overflow: hidden; margin-bottom: 10px;">
+                        <img id="logoImage" src="" alt="Logo Preview" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
+                        <span id="logoPlaceholder" style="color: #28a745; font-weight: 600;">No logo selected</span>
+                    </div>
+                    <label for="companyLogo" class="btn" style="background: #28a745; color: white; border: none; border-radius: 10px; padding: 5px 15px; font-weight: 600; cursor: pointer;">Upload Company Logo</label>
+                    <input type="file" id="companyLogo" accept="image/*" style="display: none;" />
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label for="chatbotId" class="form-label" style="color: #28a745; font-weight: 600;">Chatbot ID</label>
+                        <input type="text" placeholder="Chatbot ID" class="form-control" id="chatbotId" readonly style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn w-100" id="generateIdBtn" style="background: #28a745; color: white; border: none; border-radius: 10px; padding: 5px;">Generate ID</button>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="dataSource" class="form-label" style="color: #28a745; font-weight: 600;">Data Source</label>
+                        <select class="form-select" id="dataSource" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;">
+                            <option value="google_sheets" selected>Google Sheets</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="postgresql">PostgreSQL</option>
+                            <option value="mssql">MS SQL</option>
+                            <option value="neo4j">Neo4j</option>
+                            <option value="mongodb">MongoDB</option>
+                            <option value="oracle">Oracle</option>
+                            <option value="airtable">Airtable</option>
+                            <option value="databricks">Databricks</option>
+                            <option value="supabase">Supabase</option>
+                            <option value="snowflake">Snowflake</option>
+                            <option value="odoo">Odoo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="geminiModel" class="form-label" style="color: #28a745; font-weight: 600;">Gemini Model</label>
+                        <select class="form-select" id="geminiModel" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;">
+                            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                            <option value="gemini-pro">gemini-pro</option>
+                            <option value="gemini-2.0-flash" selected>gemini-2.0-flash</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="chatbotId" class="form-label">Chatbot ID</label>
-                    <input type="text" class="form-control" id="chatbotId" readonly />
-                    <button type="button" class="btn btn-secondary mt-2" id="generateIdBtn">Generate ID</button>
-                </div>
-                <div class="mb-3">
-                    <label for="dataSource" class="form-label">Data Source</label>
-                    <select class="form-select" id="dataSource" required>
-                        <option value="google_sheets" selected>Google Sheets</option>
-                        <option value="mysql">MySQL</option>
-                        <option value="postgresql">PostgreSQL</option>
-                        <option value="mssql">MS SQL</option>
-                        <option value="neo4j">Neo4j</option>
-                        <option value="mongodb">MongoDB</option>
-                        <option value="oracle">Oracle</option>
-                        <option value="airtable">Airtable</option>
-                        <option value="databricks">Databricks</option>
-                        <option value="supabase">Supabase</option>
-                        <option value="snowflake">Snowflake</option>
-                        <option value="odoo">Odoo</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="geminiApiKey" class="form-label">Gemini API Key</label>
-                    <input type="password" class="form-control" id="geminiApiKey" required />
-                </div>
-                <div class="mb-3">
-                    <label for="geminiModel" class="form-label">Gemini Model</label>
-                    <select class="form-select" id="geminiModel" required>
-                        <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                        <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-                        <option value="gemini-pro">gemini-pro</option>
-                        <option value="gemini-2.0-flash" selected>gemini-2.0-flash</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="companyLogo" class="form-label">Company Logo (optional)</label>
-                    <input type="file" class="form-control" id="companyLogo" accept="image/*" />
+                    <label for="geminiApiKey" class="form-label" style="color: #28a745; font-weight: 600;">Gemini API Key</label>
+                    <input type="password" placeholder="Gemini API Key" class="form-control" id="geminiApiKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                 </div>
 
                 <!-- Credential fields container -->
                 <div id="credentialFields"></div>
 
                 <div class="mb-3" id="tableSelectionContainer" style="display:none;">
-                    <label class="form-label">Select Tables / Sheets</label>
+                    <label class="form-label" style="color: #28a745; font-weight: 600;">Select Tables / Sheets</label>
                     <div id="tableSelection"></div>
                 </div>
-                <button type="submit" class="btn btn-primary">Save & Configure</button>
+                <button type="submit" class="btn" style="background: #28a745; color: white; border: none; border-radius: 10px; padding: 12px 25px; font-weight: 600; transition: background 0.3s;">Save & Configure</button>
             </form>
           </div>
         </div>
@@ -483,8 +496,8 @@
         const micBtn = document.getElementById('micBtn');
         const refreshBtn = document.getElementById('refreshBtn');
 
-        const API_BASE = 'https://share-chatbot-2.onrender.com';
-        // const API_BASE = 'http://localhost:5001';
+        // const API_BASE = 'https://share-chatbot-2.onrender.com';
+        const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
@@ -546,259 +559,298 @@
             if(dataSource === 'google_sheets') {
                 credentialFieldsDiv.innerHTML = `
                     <div class="mb-3">
-                        <label for="sheetId" class="form-label">Google Sheet ID</label>
-                        <input type="text" class="form-control" id="sheetId" required />
+                            <label for="sheetId" class="form-label">Google Sheet ID</label>
+                            <input type="text" placeholder="Sheet ID" class="form-control" id="sheetId" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />      
                     </div>
-                <div class="mb-3">
-                    <label for="serviceAccountJson" class="form-label">Service Account JSON</label>
-                    <textarea class="form-control" id="serviceAccountJson" rows="5" required></textarea>
-                </div>
-                <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <div class="mb-3">
+                        <label for="serviceAccountJson" class="form-label">Service Account JSON</label>
+                        <textarea class="form-control" id="serviceAccountJson" rows="4" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'mysql') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="dbHost" class="form-label">DB Host</label>
-                        <input type="text" class="form-control" id="dbHost" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbHost" class="form-label">DB Host</label>
+                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPort" class="form-label">DB Port</label>
+                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbUsername" class="form-label">DB Username</label>
+                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPassword" class="form-label">DB Password</label>
+                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="dbPort" class="form-label">DB Port</label>
-                        <input type="number" class="form-control" id="dbPort" required />
+                            <label for="dbName" class="form-label">DB Name</label>
+                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
-                    <div class="mb-3">
-                        <label for="dbUsername" class="form-label">DB Username</label>
-                        <input type="text" class="form-control" id="dbUsername" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbPassword" class="form-label">DB Password</label>
-                        <input type="password" class="form-control" id="dbPassword" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbName" class="form-label">DB Name</label>
-                        <input type="text" class="form-control" id="dbName" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
+
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'postgresql') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="dbHost" class="form-label">DB Host</label>
-                        <input type="text" class="form-control" id="dbHost" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbHost" class="form-label">DB Host</label>
+                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPort" class="form-label">DB Port</label>
+                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbUsername" class="form-label">DB Username</label>
+                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPassword" class="form-label">DB Password</label>
+                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="dbPort" class="form-label">DB Port</label>
-                        <input type="number" class="form-control" id="dbPort" required />
+                            <label for="dbName" class="form-label">DB Name</label>
+                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
-                    <div class="mb-3">
-                        <label for="dbUsername" class="form-label">DB Username</label>
-                        <input type="text" class="form-control" id="dbUsername" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbPassword" class="form-label">DB Password</label>
-                        <input type="password" class="form-control" id="dbPassword" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbName" class="form-label">DB Name</label>
-                        <input type="text" class="form-control" id="dbName" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
+
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'mssql') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="dbHost" class="form-label">DB Host</label>
-                        <input type="text" class="form-control" id="dbHost" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbHost" class="form-label">DB Host</label>
+                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPort" class="form-label">DB Port</label>
+                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbUsername" class="form-label">DB Username</label>
+                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPassword" class="form-label">DB Password</label>
+                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="dbPort" class="form-label">DB Port</label>
-                        <input type="number" class="form-control" id="dbPort" required />
+                            <label for="dbName" class="form-label">DB Name</label>
+                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" /> 
                     </div>
-                    <div class="mb-3">
-                        <label for="dbUsername" class="form-label">DB Username</label>
-                        <input type="text" class="form-control" id="dbUsername" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbPassword" class="form-label">DB Password</label>
-                        <input type="password" class="form-control" id="dbPassword" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbName" class="form-label">DB Name</label>
-                        <input type="text" class="form-control" id="dbName" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
+
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'neo4j') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="neo4jUri" class="form-label">Neo4j URI</label>
-                        <input type="text" class="form-control" id="neo4jUri" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="neo4jUri" class="form-label">Neo4j URI</label>
+                            <input type="text" class="form-control" id="neo4jUri" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="neo4jUsername" class="form-label">Neo4j Username</label>
+                            <input type="text" class="form-control" id="neo4jUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="neo4jUsername" class="form-label">Neo4j Username</label>
-                        <input type="text" class="form-control" id="neo4jUsername" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="neo4jPassword" class="form-label">Neo4j Password</label>
+                            <input type="password" class="form-control" id="neo4jPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="neo4jDbName" class="form-label">Neo4j Database Name</label>
+                            <input type="text" class="form-control" id="neo4jDbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="neo4jPassword" class="form-label">Neo4j Password</label>
-                        <input type="password" class="form-control" id="neo4jPassword" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="neo4jDbName" class="form-label">Neo4j Database Name</label>
-                        <input type="text" class="form-control" id="neo4jDbName" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'mongodb') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="mongoUri" class="form-label">MongoDB URI</label>
-                        <input type="text" class="form-control" id="mongoUri" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="mongoUri" class="form-label">MongoDB URI</label>
+                            <input type="text" class="form-control" id="mongoUri" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="mongoDbName" class="form-label">MongoDB Database Name</label>
+                            <input type="text" class="form-control" id="mongoDbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="mongoDbName" class="form-label">MongoDB Database Name</label>
-                        <input type="text" class="form-control" id="mongoDbName" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                        <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'oracle') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="dbHost" class="form-label">DB Host</label>
-                        <input type="text" class="form-control" id="dbHost" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbHost" class="form-label">DB Host</label>
+                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPort" class="form-label">DB Port</label>
+                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dbUsername" class="form-label">DB Username</label>
+                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dbPassword" class="form-label">DB Password</label>
+                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="dbPort" class="form-label">DB Port</label>
-                        <input type="number" class="form-control" id="dbPort" required />
+                            <label for="dbName" class="form-label">DB Name</label>
+                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
-                    <div class="mb-3">
-                        <label for="dbUsername" class="form-label">DB Username</label>
-                        <input type="text" class="form-control" id="dbUsername" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbPassword" class="form-label">DB Password</label>
-                        <input type="password" class="form-control" id="dbPassword" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="dbName" class="form-label">DB Name</label>
-                        <input type="text" class="form-control" id="dbName" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'airtable') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="airtableApiKey" class="form-label">Airtable API Key</label>
-                        <input type="password" class="form-control" id="airtableApiKey" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="airtableApiKey" class="form-label">Airtable API Key</label>
+                            <input type="password" class="form-control" id="airtableApiKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="airtableBaseId" class="form-label">Airtable Base ID</label>
+                            <input type="text" class="form-control" id="airtableBaseId" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="airtableBaseId" class="form-label">Airtable Base ID</label>
-                        <input type="text" class="form-control" id="airtableBaseId" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'databricks') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">  
-                        <label for="databricksHostname" class="form-label">Databricks Hostname</label>
-                        <input type="text" class="form-control" id="databricksHostname" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="databricksHostname" class="form-label">Databricks Hostname</label>
+                            <input type="text" class="form-control" id="databricksHostname" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="databricksHttpPath" class="form-label">Databricks HTTP Path</label>
+                            <input type="text" class="form-control" id="databricksHttpPath" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="databricksHttpPath" class="form-label">Databricks HTTP Path</label>
-                        <input type="text" class="form-control" id="databricksHttpPath" required />
+                            <label for="databricksToken" class="form-label">Databricks Token</label>
+                            <input type="password" class="form-control" id="databricksToken" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
-                    <div class="mb-3">
-                        <label for="databricksToken" class="form-label">Databricks Token</label>
-                        <input type="password" class="form-control" id="databricksToken" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'supabase') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="supabaseUrl" class="form-label">Supabase URL</label>
-                        <input type="text" class="form-control" id="supabaseUrl" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="supabaseUrl" class="form-label">Supabase URL</label>
+                            <input type="text" class="form-control" id="supabaseUrl" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="supabaseAnonKey" class="form-label">Supabase Anon Key</label>
+                            <input type="password" class="form-control" id="supabaseAnonKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="supabaseAnonKey" class="form-label">Supabase Anon Key</label>
-                        <input type="password" class="form-control" id="supabaseAnonKey" required />
-                    </div>
-                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
+                    <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'snowflake') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="snowflakeAccount" class="form-label">Snowflake Account</label>
-                        <input type="text" class="form-control" id="snowflakeAccount" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="snowflakeAccount" class="form-label">Snowflake Account</label>
+                            <input type="text" class="form-control" id="snowflakeAccount" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="snowflakeUser" class="form-label">Snowflake User</label>
+                            <input type="text" class="form-control" id="snowflakeUser" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="snowflakePassword" class="form-label">Snowflake Password</label>
+                            <input type="password" class="form-control" id="snowflakePassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="snowflakeWarehouse" class="form-label">Snowflake Warehouse</label>
+                            <input type="text" class="form-control" id="snowflakeWarehouse" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="snowflakeDatabase" class="form-label">Snowflake Database</label>
+                            <input type="text" class="form-control" id="snowflakeDatabase" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="snowflakeSchema" class="form-label">Snowflake Schema</label>
+                            <input type="text" class="form-control" id="snowflakeSchema" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="snowflakeUser" class="form-label">Snowflake User</label>
-                        <input type="text" class="form-control" id="snowflakeUser" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="snowflakePassword" class="form-label">Snowflake Password</label>
-                        <input type="password" class="form-control" id="snowflakePassword" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="snowflakeWarehouse" class="form-label">Snowflake Warehouse</label>
-                        <input type="text" class="form-control" id="snowflakeWarehouse" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="snowflakeDatabase" class="form-label">Snowflake Database</label>
-                        <input type="text" class="form-control" id="snowflakeDatabase" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="snowflakeSchema" class="form-label">Snowflake Schema</label>
-                        <input type="text" class="form-control" id="snowflakeSchema" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="snowflakeRole" class="form-label">Snowflake Role</label>
-                        <input type="text" class="form-control" id="snowflakeRole" required />
+                            <label for="snowflakeRole" class="form-label">Snowflake Role</label>
+                            <input type="text" class="form-control" id="snowflakeRole" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
             } else if(dataSource === 'odoo') {
                 credentialFieldsDiv.innerHTML = `
-                    <div class="mb-3">
-                        <label for="odooUrl" class="form-label">Odoo URL</label>
-                        <input type="text" class="form-control" id="odooUrl" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="odooUrl" class="form-label">Odoo URL</label>
+                            <input type="text" class="form-control" id="odooUrl" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="odooDb" class="form-label">Odoo Database</label>
+                            <input type="text" class="form-control" id="odooDb" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="odooDb" class="form-label">Odoo Database</label>
-                        <input type="text" class="form-control" id="odooDb" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="odooUsername" class="form-label">Odoo Username</label>
-                        <input type="text" class="form-control" id="odooUsername" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="odooPassword" class="form-label">Odoo Password</label>
-                        <input type="password" class="form-control" id="odooPassword" required />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="odooUsername" class="form-label">Odoo Username</label>
+                            <input type="text" class="form-control" id="odooUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="odooPassword" class="form-label">Odoo Password</label>
+                            <input type="password" class="form-control" id="odooPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="selectedModule" class="form-label">Odoo Module (optional)</label>
-                        <input type="text" class="form-control" id="selectedModule" />
+                        <input type="text" class="form-control" id="selectedModule" style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
                 `;
                 document.getElementById('loadTablesBtn').addEventListener('click', () => fetchTablesForDataSource(dataSource));
-
-            } else {
-                // For other data sources, you can add credential fields similarly
-                credentialFieldsDiv.innerHTML = `<p>No credential fields defined for ${dataSource} yet.</p>`;
-            }
+                } else {
+                    // For other data sources, you can add credential fields similarly
+                    credentialFieldsDiv.innerHTML = `<p>No credential fields defined for ${dataSource} yet.</p>`;
+                }
         }
-
-
+                
 
         async function fetchTablesForDataSource(dataSource) {
             tableSelectionDiv.innerHTML = '';
@@ -1301,6 +1353,27 @@
             chatMessages.appendChild(p);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+        // Logo preview functionality
+        document.getElementById('companyLogo').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const logoPreview = document.getElementById('logoPreview');
+            const logoImage = document.getElementById('logoImage');
+            const logoPlaceholder = document.getElementById('logoPlaceholder');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoImage.src = e.target.result;
+                    logoImage.style.display = 'block';
+                    logoPlaceholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                logoImage.style.display = 'none';
+                logoPlaceholder.style.display = 'block';
+                logoImage.src = '';
+            }
+        });
 
         // Initial render of credential fields
         renderCredentialFields(dataSourceSelect.value);
