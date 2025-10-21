@@ -4,6 +4,7 @@ set_credentials_data.txt
 check_embedded_chatbot.html
 TODO.md
 backend/tests
+backend/static/uploads
 backend/check_endpoints.py
 backend/__pycache__
 __pycache__/
