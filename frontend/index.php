@@ -1239,6 +1239,16 @@
                     col.className = 'col-md-3 mb-3';
                     col.innerHTML = `
                         <div class="card h-100 text-center shadow-sm hover-shadow">
+                            <!-- Three-dot menu -->
+                                <div class="dropdown position-absolute top-0 end-0 m-2">
+                                    <button class="btn btn-sm p-1" type="button" data-bs-toggle="dropdown" style="background: none; border: none; font-size: 1.2rem; line-height: 1;">
+                                        ⋮
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 100px;">
+                                        <li><a class="dropdown-item" href="#" onclick="editChatbot('${cb.share_key}')">Edit</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteChatbot('${cb.share_key}')">Delete</a></li>
+                                    </ul>
+                                </div>
                             <div class="card-body d-flex flex-column align-items-center justify-content-center">
                                 <div class="mb-3" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 123, 255, 0.1);">
                                     <img src="public/images/${cb.data_source}.svg" alt="${cb.data_source}" style="width: 30px; height: 30px;">
@@ -1377,6 +1387,107 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        async function editChatbot(key) {
+            try {
+                const response = await fetch(`${API_BASE}/edit_chatbot?share_key=${key}`);
+                if (!response.ok) throw new Error('Failed to fetch chatbot data');
+                const chatbot = await response.json();
+
+                // Populate modal with existing data
+                document.getElementById('username').value = chatbot.username || '';
+                document.getElementById('chatbotName').value = chatbot.chatbot_name || '';
+                document.getElementById('chatbotId').value = chatbot.id || '';
+                document.getElementById('dataSource').value = chatbot.data_source || 'None';
+                document.getElementById('geminiModel').value = chatbot.gemini_model || 'gemini-2.0-flash';
+                document.getElementById('shared_username').value = chatbot.shared_username || '';
+                document.getElementById('shared_password').value = chatbot.shared_password || '';
+                document.getElementById('geminiApiKey').value = chatbot.gemini_api_key || '';
+
+                // Handle data source specific fields
+                renderCredentialFields(chatbot.data_source);
+                if (chatbot.data_source === 'google_sheets') {
+                    document.getElementById('sheetId').value = chatbot.sheet_id || '';
+                    document.getElementById('serviceAccountJson').value = chatbot.service_account_json || '';
+                } else if (chatbot.data_source === 'mysql' || chatbot.data_source === 'postgresql' || chatbot.data_source === 'mssql' || chatbot.data_source === 'oracle') {
+                    document.getElementById('dbHost').value = chatbot.db_host || '';
+                    document.getElementById('dbPort').value = chatbot.db_port || '';
+                    document.getElementById('dbUsername').value = chatbot.db_username || '';
+                    document.getElementById('dbPassword').value = chatbot.db_password || '';
+                    document.getElementById('dbName').value = chatbot.db_name || '';
+                } else if (chatbot.data_source === 'neo4j') {
+                    document.getElementById('neo4jUri').value = chatbot.db_host || '';
+                    document.getElementById('neo4jUsername').value = chatbot.db_username || '';
+                    document.getElementById('neo4jPassword').value = chatbot.db_password || '';
+                    document.getElementById('neo4jDbName').value = chatbot.db_name || '';
+                } else if (chatbot.data_source === 'mongodb') {
+                    document.getElementById('mongoUri').value = chatbot.mongo_uri || '';
+                    document.getElementById('mongoDbName').value = chatbot.mongo_db_name || '';
+                } else if (chatbot.data_source === 'airtable') {
+                    document.getElementById('airtableApiKey').value = chatbot.airtable_api_key || '';
+                    document.getElementById('airtableBaseId').value = chatbot.airtable_base_id || '';
+                } else if (chatbot.data_source === 'databricks') {
+                    document.getElementById('databricksHostname').value = chatbot.databricks_hostname || '';
+                    document.getElementById('databricksHttpPath').value = chatbot.databricks_http_path || '';
+                    document.getElementById('databricksToken').value = chatbot.databricks_token || '';
+                } else if (chatbot.data_source === 'supabase') {
+                    document.getElementById('supabaseUrl').value = chatbot.supabase_url || '';
+                    document.getElementById('supabaseAnonKey').value = chatbot.supabase_anon_key || '';
+                } else if (chatbot.data_source === 'snowflake') {
+                    document.getElementById('snowflakeAccount').value = chatbot.snowflake_account || '';
+                    document.getElementById('snowflakeUser').value = chatbot.snowflake_user || '';
+                    document.getElementById('snowflakePassword').value = chatbot.snowflake_password || '';
+                    document.getElementById('snowflakeWarehouse').value = chatbot.snowflake_warehouse || '';
+                    document.getElementById('snowflakeDatabase').value = chatbot.snowflake_database || '';
+                    document.getElementById('snowflakeSchema').value = chatbot.snowflake_schema || '';
+                    document.getElementById('snowflakeRole').value = chatbot.snowflake_role || '';
+                } else if (chatbot.data_source === 'odoo') {
+                    document.getElementById('odooUrl').value = chatbot.odoo_url || '';
+                    document.getElementById('odooDb').value = chatbot.odoo_db || '';
+                    document.getElementById('odooUsername').value = chatbot.odoo_username || '';
+                    document.getElementById('odooPassword').value = chatbot.odoo_password || '';
+                    document.getElementById('selectedModule').value = chatbot.selected_module || '';
+                }
+
+                // Set selected tables/sheets
+                const selectedItems = JSON.parse(chatbot.selected_tables || chatbot.selected_sheets || '[]');
+                // Note: For simplicity, we'll skip pre-selecting checkboxes as it requires more complex logic
+
+                // Change modal title and button text for editing
+                document.getElementById('configModalLabel').textContent = 'Edit Chatbot';
+                document.querySelector('#configForm button[type="submit"]').textContent = 'Update Chatbot';
+
+                // Store edit mode and share key
+                configForm.dataset.isEdit = 'true';
+                configForm.dataset.shareKey = key;
+
+                // Show modal
+                configModal.show();
+
+            } catch (error) {
+                alert('Error loading chatbot data: ' + error.message);
+            }
+        }
+
+        async function deleteChatbot(key) {
+            if (confirm("Are you sure you want to delete this chatbot?")) {
+                try {
+                    const response = await fetch(`${API_BASE}/delete_chatbot?share_key=${key}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) throw new Error('Failed to delete chatbot');
+                    const result = await response.json();
+                    alert(result.message);
+                    // Refresh the chatbot list
+                    const username = usernameInput.value.trim();
+                    if (username) {
+                        loadChatbots(username);
+                    }
+                } catch (error) {
+                    alert('Error deleting chatbot: ' + error.message);
+                }
+            }
+        }
+        
         // Logo preview functionality
         document.getElementById('companyLogo').addEventListener('change', function(event) {
             const file = event.target.files[0];

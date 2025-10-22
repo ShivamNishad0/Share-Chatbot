@@ -1420,11 +1420,19 @@ def save_chatbot():
             db_username = data.get('db_username')
             db_password = data.get('db_password')
 
-        # Generate share_key if not exists
+        # Check if editing existing chatbot
+        is_edit = data.get('is_edit', False)
         share_key = data.get('share_key')
-        if not share_key:
-            share_key = secrets.token_urlsafe(16)
-            logging.info(f"Generated new share_key: {share_key}")
+
+        if is_edit:
+            if not share_key:
+                return jsonify({"success": False, "message": "Share key required for editing"}), 400
+            # Keep existing share_key for edits
+        else:
+            # Generate new share_key for new chatbots
+            if not share_key:
+                share_key = secrets.token_urlsafe(16)
+                logging.info(f"Generated new share_key: {share_key}")
 
         chatbot_data = {
             'id': data['chatbot_id'],
@@ -1516,6 +1524,38 @@ def list_chatbots():
     rows = cursor.fetchall()
     conn.close()
     return jsonify([dict(row) for row in rows])
+
+# --- Edit chatbot ---
+@main_bp.route('/edit_chatbot', methods=['GET'])
+def edit_chatbot():
+    share_key = request.args.get('share_key')
+    if not share_key:
+        return jsonify({"error": "Share key required"}), 400
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM chatbots WHERE share_key=?", (share_key,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "Chatbot not found"}), 404
+    return jsonify(dict(row))
+
+# --- Delete chatbot ---
+@main_bp.route('/delete_chatbot', methods=['DELETE'])
+def delete_chatbot():
+    share_key = request.args.get('share_key')
+    if not share_key:
+        return jsonify({"error": "Share key required"}), 400
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM chatbots WHERE share_key=?", (share_key,))
+    deleted = cursor.rowcount
+    conn.commit()
+    conn.close()
+    if deleted == 0:
+        return jsonify({"error": "Chatbot not found"}), 404
+    return jsonify({"success": True, "message": "Chatbot deleted successfully"})
 
 # --- Shared Chatbot ---
 @main_bp.route('/shared/<share_key>', methods=['GET'])
@@ -1679,13 +1719,13 @@ def render_login_page(cb, share_key):
             <form id="loginForm">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" required>
+                    <input type="text" placeholder="Enter username" class="form-control" id="username" required style="border: 2px solid #28a745; border-radius: 10px;">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" required>
+                    <input type="password" placeholder="Enter password" class="form-control" id="password" required style="border: 2px solid #28a745; border-radius: 10px;">
                 </div>
-                <button type="submit" class="btn w-100" style="background-color: #28a745; border-color: #28a745; color: white;">
+                <button type="submit" class="btn w-100" style="background-color: gray; border-color: #28a745; color: white;">
                     <i class="fas fa-sign-in-alt me-2"></i>Login
                 </button>
             </form>
