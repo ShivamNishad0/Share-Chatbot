@@ -507,8 +507,8 @@
         const micBtn = document.getElementById('micBtn');
         const refreshBtn = document.getElementById('refreshBtn');
 
-        // const API_BASE = 'https://share-chatbot-2.onrender.com';
-        const API_BASE = 'http://localhost:5001';
+        const API_BASE = 'https://share-chatbot-2.onrender.com';
+        // const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
