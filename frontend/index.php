@@ -391,7 +391,8 @@
                     <div class="col-md-6">
                         <label for="dataSource" class="form-label" style="color: #28a745; font-weight: 600;">Data Source</label>
                         <select class="form-select" id="dataSource" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;">
-                            <option value="google_sheets" selected>Google Sheets</option>
+                            <option selected>None</option>
+                            <option value="google_sheets">Google Sheets</option>
                             <option value="mysql">MySQL</option>
                             <option value="postgresql">PostgreSQL</option>
                             <option value="mssql">MS SQL</option>
@@ -496,8 +497,8 @@
         const micBtn = document.getElementById('micBtn');
         const refreshBtn = document.getElementById('refreshBtn');
 
-        const API_BASE = 'https://share-chatbot-2.onrender.com';
-        // const API_BASE = 'http://localhost:5001';
+        // const API_BASE = 'https://share-chatbot-2.onrender.com';
+        const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
@@ -574,26 +575,26 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbHost" class="form-label">DB Host</label>
-                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Host" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPort" class="form-label">DB Port</label>
-                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="number" placeholder="DB Port" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbUsername" class="form-label">DB Username</label>
-                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Username" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPassword" class="form-label">DB Password</label>
-                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="DB Password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="mb-3">
                             <label for="dbName" class="form-label">DB Name</label>
-                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Name" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
 
@@ -604,26 +605,26 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbHost" class="form-label">DB Host</label>
-                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Host" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPort" class="form-label">DB Port</label>
-                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="number" placeholder="DB Port" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbUsername" class="form-label">DB Username</label>
-                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Username" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPassword" class="form-label">DB Password</label>
-                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="DB Password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="mb-3">
                             <label for="dbName" class="form-label">DB Name</label>
-                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Name" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
 
@@ -634,26 +635,26 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbHost" class="form-label">DB Host</label>
-                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Host" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPort" class="form-label">DB Port</label>
-                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="number" placeholder="DB Port" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbUsername" class="form-label">DB Username</label>
-                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Username" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPassword" class="form-label">DB Password</label>
-                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="DB Password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="mb-3">
                             <label for="dbName" class="form-label">DB Name</label>
-                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" /> 
+                            <input type="text" placeholder="DB Name" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" /> 
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
 
@@ -664,21 +665,21 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="neo4jUri" class="form-label">Neo4j URI</label>
-                            <input type="text" class="form-control" id="neo4jUri" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Neo4j URI" class="form-control" id="neo4jUri" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="neo4jUsername" class="form-label">Neo4j Username</label>
-                            <input type="text" class="form-control" id="neo4jUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Neo4j Username" class="form-control" id="neo4jUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="neo4jPassword" class="form-label">Neo4j Password</label>
-                            <input type="password" class="form-control" id="neo4jPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="Neo4j Password" class="form-control" id="neo4jPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="neo4jDbName" class="form-label">Neo4j Database Name</label>
-                            <input type="text" class="form-control" id="neo4jDbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Neo4j Database Name" class="form-control" id="neo4jDbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
@@ -689,11 +690,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="mongoUri" class="form-label">MongoDB URI</label>
-                            <input type="text" class="form-control" id="mongoUri" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="MongoDB URI" class="form-control" id="mongoUri" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="mongoDbName" class="form-label">MongoDB Database Name</label>
-                            <input type="text" class="form-control" id="mongoDbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="MongoDB Database Name" class="form-control" id="mongoDbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                         <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
@@ -704,26 +705,26 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbHost" class="form-label">DB Host</label>
-                            <input type="text" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Host" class="form-control" id="dbHost" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPort" class="form-label">DB Port</label>
-                            <input type="number" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="number" placeholder="DB Port" class="form-control" id="dbPort" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="dbUsername" class="form-label">DB Username</label>
-                            <input type="text" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Username" class="form-control" id="dbUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="dbPassword" class="form-label">DB Password</label>
-                            <input type="password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="DB Password" class="form-control" id="dbPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="mb-3">
                             <label for="dbName" class="form-label">DB Name</label>
-                            <input type="text" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="DB Name" class="form-control" id="dbName" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
@@ -733,11 +734,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="airtableApiKey" class="form-label">Airtable API Key</label>
-                            <input type="password" class="form-control" id="airtableApiKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="Airtable API Key" class="form-control" id="airtableApiKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="airtableBaseId" class="form-label">Airtable Base ID</label>
-                            <input type="text" class="form-control" id="airtableBaseId" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Airtable Base ID" class="form-control" id="airtableBaseId" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
@@ -748,16 +749,16 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="databricksHostname" class="form-label">Databricks Hostname</label>
-                            <input type="text" class="form-control" id="databricksHostname" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Databricks Hostname" class="form-control" id="databricksHostname" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="databricksHttpPath" class="form-label">Databricks HTTP Path</label>
-                            <input type="text" class="form-control" id="databricksHttpPath" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Databricks HTTP Path" class="form-control" id="databricksHttpPath" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="mb-3">
                             <label for="databricksToken" class="form-label">Databricks Token</label>
-                            <input type="password" class="form-control" id="databricksToken" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="Databricks Token" class="form-control" id="databricksToken" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
                 `;
@@ -767,11 +768,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="supabaseUrl" class="form-label">Supabase URL</label>
-                            <input type="text" class="form-control" id="supabaseUrl" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Supabase URL" class="form-control" id="supabaseUrl" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="supabaseAnonKey" class="form-label">Supabase Anon Key</label>
-                            <input type="password" class="form-control" id="supabaseAnonKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="Supabase Anon Key" class="form-control" id="supabaseAnonKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn" style="padding: 5px;">Load Tables</button>
@@ -782,36 +783,36 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="snowflakeAccount" class="form-label">Snowflake Account</label>
-                            <input type="text" class="form-control" id="snowflakeAccount" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Snowflake Account" class="form-control" id="snowflakeAccount" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="snowflakeUser" class="form-label">Snowflake User</label>
-                            <input type="text" class="form-control" id="snowflakeUser" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Snowflake User" class="form-control" id="snowflakeUser" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="snowflakePassword" class="form-label">Snowflake Password</label>
-                            <input type="password" class="form-control" id="snowflakePassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="password" placeholder="Snowflake Password" class="form-control" id="snowflakePassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="snowflakeWarehouse" class="form-label">Snowflake Warehouse</label>
-                            <input type="text" class="form-control" id="snowflakeWarehouse" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Snowflake Warehouse" class="form-control" id="snowflakeWarehouse" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="snowflakeDatabase" class="form-label">Snowflake Database</label>
-                            <input type="text" class="form-control" id="snowflakeDatabase" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Snowflake Database" class="form-control" id="snowflakeDatabase" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                         <div class="col-md-6">
                             <label for="snowflakeSchema" class="form-label">Snowflake Schema</label>
-                            <input type="text" class="form-control" id="snowflakeSchema" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Snowflake Schema" class="form-control" id="snowflakeSchema" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                         </div>
                     </div>
                     <div class="mb-3">
                             <label for="snowflakeRole" class="form-label">Snowflake Role</label>
-                            <input type="text" class="form-control" id="snowflakeRole" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                            <input type="text" placeholder="Snowflake Role" class="form-control" id="snowflakeRole" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
                 `;
@@ -821,26 +822,30 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="odooUrl" class="form-label">Odoo URL</label>
-                            <input type="text" class="form-control" id="odooUrl" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                            <input type="text" placeholder="Odoo URL" class="form-control" id="odooUrl" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
                         </div>
                         <div class="col-md-6">
                             <label for="odooDb" class="form-label">Odoo Database</label>
-                            <input type="text" class="form-control" id="odooDb" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                            <input type="text" placeholder="Odoo Database" class="form-control" id="odooDb" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="odooUsername" class="form-label">Odoo Username</label>
-                            <input type="text" class="form-control" id="odooUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                            <input type="text" placeholder="Odoo Username" class="form-control" id="odooUsername" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
                         </div>
                         <div class="col-md-6">
                             <label for="odooPassword" class="form-label">Odoo Password</label>
-                            <input type="password" class="form-control" id="odooPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                            <input type="password" placeholder="Odoo Password" class="form-control" id="odooPassword" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="selectedModule" class="form-label">Odoo Module (optional)</label>
-                        <input type="text" class="form-control" id="selectedModule" style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;"/>
+                        <label for="selectedModule" class="form-label">Odoo Module</label>
+                        <select class="form-select" placeholder="Odoo Module" id="selectedModule" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;">
+                            <option value="CRM">CRM</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Inventry">Inventry</option>
+                        </select>
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="loadTablesBtn">Load Tables</button>
                 `;
