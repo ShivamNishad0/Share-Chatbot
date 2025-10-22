@@ -416,6 +416,16 @@
                         </select>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="setusername" class="form-label" style="color: #28a745; font-weight: 600;">Set Username</label>
+                        <input type="text" placeholder="Username" class="form-control" id="shared_username" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="setpassword" class="form-label" style="color: #28a745; font-weight: 600;">Set Password</label>
+                        <input type="password" placeholder="Password" class="form-control" id="shared_password" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
+                    </div>
+                </div>
                 <div class="mb-3">
                     <label for="geminiApiKey" class="form-label" style="color: #28a745; font-weight: 600;">Gemini API Key</label>
                     <input type="password" placeholder="Gemini API Key" class="form-control" id="geminiApiKey" required style="border: 2px solid #28a745; border-radius: 10px; padding: 5px;" />
@@ -497,8 +507,8 @@
         const micBtn = document.getElementById('micBtn');
         const refreshBtn = document.getElementById('refreshBtn');
 
-        const API_BASE = 'https://share-chatbot-2.onrender.com';
-        // const API_BASE = 'http://localhost:5001';
+        // const API_BASE = 'https://share-chatbot-2.onrender.com';
+        const API_BASE = 'http://localhost:5001';
 
         let clickCount = 0;
         let configured = false;
@@ -948,9 +958,15 @@
             const chatbotId = chatbotIdInput.value.trim();
             const dataSource = dataSourceSelect.value;
             const selectedTables = Array.from(tableSelectionDiv.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+            const sharedUsername = document.getElementById('shared_username').value.trim();
+            const sharedPassword = document.getElementById('shared_password').value.trim();
 
             if(!username || !chatbotName || !chatbotId) {
                 alert('Please fill username, chatbot name, and generate ID.');
+                return;
+            }
+            if(!sharedUsername || !sharedPassword) {
+                alert('Please fill set username and password.');
                 return;
             }
 
@@ -973,6 +989,8 @@
             formData.append('gemini_api_key', geminiApiKey);
             formData.append('gemini_model', geminiModel);
             formData.append('selected_tables', JSON.stringify(selectedTables));
+            formData.append('shared_username', sharedUsername);
+            formData.append('shared_password', sharedPassword);
 
             // Handle logo upload
             const logoFile = document.getElementById('companyLogo').files[0];

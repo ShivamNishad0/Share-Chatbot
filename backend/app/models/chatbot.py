@@ -6,7 +6,8 @@ class Chatbot:
                  selected_tables=None, mongo_uri=None, mongo_db_name=None,
                  selected_collections=None, airtable_api_key=None, airtable_base_id=None,
                  databricks_hostname=None, databricks_http_path=None, databricks_token=None,
-                 odoo_url=None, odoo_db=None, odoo_username=None, odoo_password=None, selected_module=None):
+                 odoo_url=None, odoo_db=None, odoo_username=None, odoo_password=None, selected_module=None,
+                 shared_username=None, shared_password=None):
         self.id = id
         self.username = username
         self.chatbot_name = chatbot_name
@@ -35,6 +36,8 @@ class Chatbot:
         self.odoo_username = odoo_username
         self.odoo_password = odoo_password
         self.selected_module = selected_module
+        self.shared_username = shared_username
+        self.shared_password = shared_password
 
     def to_dict(self):
         return {
@@ -65,7 +68,9 @@ class Chatbot:
             'odoo_db': self.odoo_db,
             'odoo_username': self.odoo_username,
             'odoo_password': self.odoo_password,
-            'selected_module': self.selected_module
+            'selected_module': self.selected_module,
+            'shared_username': self.shared_username,
+            'shared_password': self.shared_password
         }
 
     @classmethod
@@ -98,5 +103,7 @@ class Chatbot:
             odoo_db=data.get('odoo_db'),
             odoo_username=data.get('odoo_username'),
             odoo_password=data.get('odoo_password'),
-            selected_module=data.get('selected_module')
+            selected_module=data.get('selected_module'),
+            shared_username=data.get('shared_username'),
+            shared_password=data.get('shared_password')
         )

@@ -314,7 +314,9 @@ def init_db():
             odoo_db TEXT,
             odoo_username TEXT,
             odoo_password TEXT,
-            selected_module TEXT
+            selected_module TEXT,
+            shared_username TEXT,
+            shared_password TEXT
         )
     """)
 
@@ -1462,6 +1464,8 @@ def save_chatbot():
             'odoo_username': data.get('odoo_username'),
             'odoo_password': data.get('odoo_password'),
             'selected_module': data.get('selected_module'),
+            'shared_username': data.get('shared_username'),
+            'shared_password': data.get('shared_password'),
             'share_key': share_key,
             'company_logo': company_logo_path or data.get('company_logo'),
             'nav_color': data.get('nav_color'),
@@ -1530,6 +1534,198 @@ def shared_chatbot(share_key):
     logging.info(f"Chatbot found for share_key: {share_key}, chatbot_name: {row['chatbot_name']}")
 
     cb = dict(row)
+
+    # Check if shared auth is required
+    if cb.get('shared_username') and cb.get('shared_password'):
+        # Serve login page
+        return render_login_page(cb, share_key)
+    else:
+        # Serve chat page directly
+        return render_chat_page(cb, share_key)
+
+# --- Shared Chatbot Login ---
+@main_bp.route('/shared/<share_key>/login', methods=['POST'])
+def shared_chatbot_login(share_key):
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT shared_username, shared_password FROM chatbots WHERE share_key=?", (share_key,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return jsonify({'success': False, 'message': 'Chatbot not found'}), 404
+
+    if row['shared_username'] == username and row['shared_password'] == password:
+        # For simplicity, use session or token; here, just return success
+        # In production, implement proper session management
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
+
+# --- Shared Chatbot Chat Page ---
+@main_bp.route('/shared/<share_key>/chat', methods=['GET'])
+def shared_chatbot_chat(share_key):
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM chatbots WHERE share_key=?", (share_key,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return "Chatbot not found", 404
+
+    cb = dict(row)
+    return render_chat_page(cb, share_key)
+
+def render_login_page(cb, share_key):
+    styles = {
+        'nav_color': cb.get('nav_color', '#007bff'),
+        'text_color': cb.get('text_color', '#000000'),
+        'content_bg_color': cb.get('content_bg_color', '#ffffff'),
+        'textarea_color': cb.get('textarea_color', '#ffffff'),
+        'textarea_border_color': cb.get('textarea_border_color', '#cccccc'),
+        'textarea_border_thickness': cb.get('textarea_border_thickness', '1px'),
+        'button_color': cb.get('button_color', '#007bff'),
+        'button_text_color': cb.get('button_text_color', '#ffffff'),
+        'border_color': cb.get('border_color', '#007bff'),
+        'border_thickness': cb.get('border_thickness', '2px'),
+        'nav_border_color': cb.get('nav_border_color', '#007bff'),
+        'nav_border_thickness': cb.get('nav_border_thickness', '2px'),
+        'company_logo': cb.get('company_logo', '')
+    }
+
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{cb['chatbot_name']} - Login</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <style>
+            body {{
+                background: linear-gradient(135deg, {styles['content_bg_color']} 0%, #f8f9fa 100%);
+                color: {styles['text_color']};
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }}
+            .navbar {{
+                background: linear-gradient(90deg, {styles['nav_color']} 0%, #0056b3 100%) !important;
+                border-bottom: {styles['nav_border_thickness']} solid {styles['nav_border_color']} !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1000;
+            }}
+            .login-container {{
+                border: {styles['border_thickness']} solid {styles['border_color']};
+                border-radius: 15px;
+                padding: 40px;
+                margin-top: 80px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                max-width: 400px;
+                width: 100%;
+            }}
+            .form-control {{
+                background-color: {styles['textarea_color']} !important;
+                border-color: {styles['textarea_border_color']} !important;
+                border-width: {styles['textarea_border_thickness']} !important;
+                border-radius: 25px !important;
+                padding: 12px 20px;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            }}
+            .btn-primary {{
+                background: linear-gradient(45deg, {styles['button_color']} 0%, #0056b3 100%) !important;
+                border-color: {styles['button_color']} !important;
+                color: {styles['button_text_color']} !important;
+                border-radius: 25px !important;
+                padding: 12px 30px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            }}
+            .btn-primary:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+            }}
+            .alert {{
+                border-radius: 10px;
+            }}
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                {f'<img src="{styles["company_logo"]}" alt="Logo" style="height: 40px; margin-right: 10px;">' if styles['company_logo'] else ''}
+                <span class="navbar-brand fw-bold">{cb['chatbot_name']}</span>
+            </div>
+        </nav>
+        <div class="login-container">
+            <h4 class="text-center mb-4">
+                <i class="fas fa-lock me-2" style="color: #28a745;"></i>Login to {cb['chatbot_name']}
+            </h4>
+            <div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert"></div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn w-100" style="background-color: #28a745; border-color: #28a745; color: white;">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </form>
+        </div>
+        <script>
+            const API_BASE = window.location.origin;
+            const shareKey = "{share_key}";
+
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {{
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const errorAlert = document.getElementById('errorAlert');
+
+                try {{
+                    const res = await fetch(`${{API_BASE}}/shared/${{shareKey}}/login`, {{
+                        method: 'POST',
+                        headers: {{'Content-Type': 'application/json'}},
+                        body: JSON.stringify({{username: username, password: password}})
+                    }});
+                    const data = await res.json();
+                    if (data.success) {{
+                        // Redirect to chat page
+                        window.location.href = `${{API_BASE}}/shared/${{shareKey}}/chat`;
+                    }} else {{
+                        errorAlert.textContent = data.message || 'Invalid credentials';
+                        errorAlert.style.display = 'block';
+                    }}
+                }} catch (e) {{
+                    errorAlert.textContent = 'Login failed. Please try again.';
+                    errorAlert.style.display = 'block';
+                }}
+            }});
+        </script>
+    </body>
+    </html>
+    """
+    return html
+
+def render_chat_page(cb, share_key):
     # Apply default styles if not set
     styles = {
         'nav_color': cb.get('nav_color', '#007bff'),
