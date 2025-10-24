@@ -221,7 +221,12 @@ main_bp = Blueprint('main', __name__)
 # --- Status/Health Check ---
 @main_bp.route('/', methods=['GET'])
 def status():
-    """Health check endpoint"""
+    """
+    Health check endpoint.
+
+    Returns:
+        JSON: Status information about the API
+    """
     return jsonify({
         "status": "running",
         "message": "ChatBot API is running successfully",
@@ -241,6 +246,12 @@ DB_FILE = "chatbots.db"
 
 # --- Initialize database ---
 def init_db():
+    """
+    Initialize the SQLite database with required tables.
+
+    Creates tables for users, user agreements, chatbots, and password resets
+    if they don't already exist.
+    """
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute("""
@@ -298,6 +309,7 @@ def init_db():
             snowflake_role TEXT,
             share_key TEXT UNIQUE,
             company_logo TEXT,
+            company_name TEXT,
             nav_color TEXT,
             text_color TEXT,
             content_bg_color TEXT,
@@ -341,14 +353,32 @@ init_db()
 
 # --- Utility Functions ---
 def generate_reset_token(length=32):
-    """Generate a secure random token for password reset"""
+    """
+    Generate a secure random token for password reset.
+
+    Args:
+        length (int): Length of the token to generate (default: 32)
+
+    Returns:
+        str: Randomly generated token
+    """
     alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 def send_reset_email(username, reset_token, frontend_url=None):
+    """
+    Send password reset email using SMTP.
+
+    Args:
+        username (str): Email address of the user
+        reset_token (str): Password reset token
+        frontend_url (str, optional): Frontend URL for reset link
+
+    Returns:
+        bool: True if email sent successfully, False otherwise
+    """
     if frontend_url is None:
         frontend_url = Config().FRONTEND_URL
-    """Send password reset email using SMTP"""
     try:
         # SMTP configuration
         smtp_server = "mail.smartcardai.com"
@@ -426,6 +456,15 @@ def send_reset_email(username, reset_token, frontend_url=None):
 # --- Set credentials and list items ---
 @main_bp.route('/set_credentials', methods=['POST'])
 def set_credentials():
+    """
+    Set credentials for a data source and list available items (tables/sheets/etc).
+
+    Expects form data with data_source and relevant credentials.
+    Returns JSON with type and items list.
+
+    Returns:
+        JSON: {'type': str, 'items': list} or {'error': str}
+    """
     global CONFIG, gc, spreadsheet, gemini_client, db_conn
     CONFIG = request.form.to_dict()
     data_source = CONFIG.get('data_source')
@@ -697,6 +736,16 @@ def set_credentials():
 # --- Load sheets for Google Sheets ---
 @main_bp.route('/load_sheets', methods=['POST'])
 def load_sheets():
+    """
+    Load Google Sheets for a given sheet_id and service account JSON.
+
+    Args (POST data):
+        sheet_id (str): Google Sheets ID
+        service_account_json (str): JSON string of service account credentials
+
+    Returns:
+        JSON: {'sheets': list} or {'error': str}
+    """
     data = request.json
     sheet_id = data.get('sheet_id')
     service_account_json_str = data.get('service_account_json')
@@ -725,6 +774,15 @@ def load_sheets():
 # --- Set selected items ---
 @main_bp.route('/set_items', methods=['POST'])
 def set_items():
+    """
+    Set selected items (tables/sheets) for the current session.
+
+    Args (POST data):
+        item_names (list): List of selected item names
+
+    Returns:
+        JSON: {'selected_items': list}
+    """
     global worksheets, selected_tables, CONFIG
     data_source = CONFIG.get('data_source')
     selected = request.form.getlist('item_names')
@@ -742,6 +800,19 @@ def set_items():
 # --- Chat endpoint ---
 @main_bp.route('/chat', methods=['POST'])
 def chat():
+    """
+    Handle chat requests with AI-powered responses based on connected data sources.
+
+    Supports both regular chat and shared chatbot access via share_key.
+
+    Args (JSON data):
+        message (str): User's message
+        share_key (str, optional): For shared chatbot access
+        config_id (str, optional): For config-based access
+
+    Returns:
+        JSON: {'response': str}
+    """
     global worksheets, selected_tables, CONFIG, gemini_client, db_conn
     logging.info("Chat endpoint called")
 
@@ -1299,6 +1370,17 @@ def chat():
 # --- Save chatbot ---
 @main_bp.route('/save_chatbot', methods=['POST'])
 def save_chatbot():
+    """
+    Save a chatbot configuration to the database.
+
+    Handles logo upload and generates share_key if not provided.
+
+    Args (form data):
+        Various chatbot configuration fields including credentials, styling, etc.
+
+    Returns:
+        JSON: {'share_key': str} or {'success': False, 'message': str}
+    """
     try:
         data = request.form
         logging.info(f"Received save_chatbot data: {dict(data)}")
@@ -1420,19 +1502,11 @@ def save_chatbot():
             db_username = data.get('db_username')
             db_password = data.get('db_password')
 
-        # Check if editing existing chatbot
-        is_edit = data.get('is_edit', False)
+        # Generate share_key if not exists
         share_key = data.get('share_key')
-
-        if is_edit:
-            if not share_key:
-                return jsonify({"success": False, "message": "Share key required for editing"}), 400
-            # Keep existing share_key for edits
-        else:
-            # Generate new share_key for new chatbots
-            if not share_key:
-                share_key = secrets.token_urlsafe(16)
-                logging.info(f"Generated new share_key: {share_key}")
+        if not share_key:
+            share_key = secrets.token_urlsafe(16)
+            logging.info(f"Generated new share_key: {share_key}")
 
         chatbot_data = {
             'id': data['chatbot_id'],
@@ -1501,6 +1575,15 @@ def save_chatbot():
 # --- Check chatbot count for restrictions ---
 @main_bp.route('/check_chatbot_count', methods=['GET'])
 def check_chatbot_count():
+    """
+    Check the number of Google Sheets chatbots for a user (for restrictions).
+
+    Args (query params):
+        username (str): Username to check
+
+    Returns:
+        JSON: {'count': int} or {'error': str}
+    """
     username = request.args.get('username')
     if not username:
         return jsonify({"error": "Username required"}), 400
@@ -1514,6 +1597,15 @@ def check_chatbot_count():
 # --- List saved chatbots ---
 @main_bp.route('/list_chatbots', methods=['GET'])
 def list_chatbots():
+    """
+    List all chatbots for a specific user.
+
+    Args (query params):
+        username (str): Username to filter chatbots by
+
+    Returns:
+        JSON: List of chatbot dictionaries or {'error': str}
+    """
     username = request.args.get('username')
     if not username:
         return jsonify({"error": "Username required"}), 400
@@ -1525,9 +1617,18 @@ def list_chatbots():
     conn.close()
     return jsonify([dict(row) for row in rows])
 
-# --- Edit chatbot ---
+#--- Edit chatbot ---
 @main_bp.route('/edit_chatbot', methods=['GET'])
 def edit_chatbot():
+    """
+    Get chatbot configuration for editing.
+
+    Args (query params):
+        share_key (str): Share key of the chatbot to edit
+
+    Returns:
+        JSON: Chatbot configuration dictionary or {'error': str}
+    """
     share_key = request.args.get('share_key')
     if not share_key:
         return jsonify({"error": "Share key required"}), 400
@@ -1544,6 +1645,15 @@ def edit_chatbot():
 # --- Delete chatbot ---
 @main_bp.route('/delete_chatbot', methods=['DELETE'])
 def delete_chatbot():
+    """
+    Delete a chatbot configuration.
+
+    Args (query params):
+        share_key (str): Share key of the chatbot to delete
+
+    Returns:
+        JSON: {'success': True} or {'error': str}
+    """
     share_key = request.args.get('share_key')
     if not share_key:
         return jsonify({"error": "Share key required"}), 400
@@ -1555,11 +1665,22 @@ def delete_chatbot():
     conn.close()
     if deleted == 0:
         return jsonify({"error": "Chatbot not found"}), 404
-    return jsonify({"success": True, "message": "Chatbot deleted successfully"})
+    return jsonify({"success": True})
 
 # --- Shared Chatbot ---
 @main_bp.route('/shared/<share_key>', methods=['GET'])
 def shared_chatbot(share_key):
+    """
+    Serve shared chatbot page.
+
+    If shared auth is required, serves login page; otherwise serves chat page directly.
+
+    Args:
+        share_key (str): Unique share key for the chatbot
+
+    Returns:
+        HTML: Login or chat page
+    """
     logging.info(f"Shared chatbot requested with share_key: {share_key}")
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
@@ -1586,6 +1707,19 @@ def shared_chatbot(share_key):
 # --- Shared Chatbot Login ---
 @main_bp.route('/shared/<share_key>/login', methods=['POST'])
 def shared_chatbot_login(share_key):
+    """
+    Handle login for shared chatbot with authentication.
+
+    Args:
+        share_key (str): Unique share key for the chatbot
+
+    JSON data:
+        username (str): Shared username
+        password (str): Shared password
+
+    Returns:
+        JSON: {'success': True} or {'success': False, 'message': str}
+    """
     data = request.json
     username = data.get('username')
     password = data.get('password')
@@ -1610,6 +1744,15 @@ def shared_chatbot_login(share_key):
 # --- Shared Chatbot Chat Page ---
 @main_bp.route('/shared/<share_key>/chat', methods=['GET'])
 def shared_chatbot_chat(share_key):
+    """
+    Serve the chat page for shared chatbot after authentication.
+
+    Args:
+        share_key (str): Unique share key for the chatbot
+
+    Returns:
+        HTML: Chat interface page
+    """
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -1623,6 +1766,16 @@ def shared_chatbot_chat(share_key):
     return render_chat_page(cb, share_key)
 
 def render_login_page(cb, share_key):
+    """
+    Render the login page HTML for shared chatbot authentication.
+
+    Args:
+        cb (dict): Chatbot configuration
+        share_key (str): Unique share key
+
+    Returns:
+        str: HTML content for login page
+    """
     styles = {
         'nav_color': cb.get('nav_color', '#007bff'),
         'text_color': cb.get('text_color', '#000000'),
@@ -1766,6 +1919,16 @@ def render_login_page(cb, share_key):
     return html
 
 def render_chat_page(cb, share_key):
+    """
+    Render the chat interface HTML for shared chatbot.
+
+    Args:
+        cb (dict): Chatbot configuration
+        share_key (str): Unique share key
+
+    Returns:
+        str: HTML content for chat page
+    """
     # Apply default styles if not set
     styles = {
         'nav_color': cb.get('nav_color', '#007bff'),
@@ -1804,11 +1967,13 @@ def render_chat_page(cb, share_key):
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 min-height: 100vh;
             }}
+
             .navbar {{
                 background: linear-gradient(90deg, {styles['nav_color']} 0%, #0056b3 100%) !important;
                 border-bottom: {styles['nav_border_thickness']} solid {styles['nav_border_color']} !important;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }}
+
             .chat-container {{
                 border: {styles['border_thickness']} solid {styles['border_color']};
                 border-radius: 15px;
@@ -1821,6 +1986,7 @@ def render_chat_page(cb, share_key):
                 margin-left: auto;
                 margin-right: auto;
             }}
+
             .form-control {{
                 background-color: {styles['textarea_color']} !important;
                 border-color: {styles['textarea_border_color']} !important;
@@ -1829,6 +1995,7 @@ def render_chat_page(cb, share_key):
                 padding: 12px 20px;
                 box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
             }}
+
             .btn-primary {{
                 background: linear-gradient(45deg, {styles['button_color']} 0%, #0056b3 100%) !important;
                 border-color: {styles['button_color']} !important;
@@ -1839,10 +2006,12 @@ def render_chat_page(cb, share_key):
                 transition: all 0.3s ease;
                 box-shadow: 0 4px 15px rgba(0,123,255,0.3);
             }}
+
             .btn-primary:hover {{
                 transform: translateY(-2px);
                 box-shadow: 0 6px 20px rgba(0,123,255,0.4);
             }}
+
             #chat {{
                 height: 400px;
                 overflow-y: auto;
@@ -1852,6 +2021,7 @@ def render_chat_page(cb, share_key):
                 background: rgba(248, 249, 250, 0.5);
                 backdrop-filter: blur(5px);
             }}
+
             .message {{
                 margin-bottom: 15px;
                 padding: 12px 16px;
@@ -1864,24 +2034,28 @@ def render_chat_page(cb, share_key):
                 animation: fadeIn 0.5s ease-in;
                 position: relative;
             }}
+
             .message.user {{
                 background: linear-gradient(135deg, {styles['button_color']} 0%, #0056b3 100%);
                 color: black;
                 margin-left: auto;
                 text-align: right;
-                box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             }}
+
             .message.bot {{
                 background: rgba(255, 255, 255, 0.9);
                 color: #333;
                 margin-right: auto;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             }}
+
             .timestamp {{
                 font-size: 0.75rem;
                 opacity: 0.7;
                 margin-top: 5px;
             }}
+
             .typing-indicator {{
                 display: none;
                 padding: 12px 16px;
@@ -1891,17 +2065,20 @@ def render_chat_page(cb, share_key):
                 max-width: 70%;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }}
+
             .typing-dots {{
                 display: flex;
                 gap: 4px;
             }}
+
             .typing-dot {{
                 width: 8px;
                 height: 8px;
-                background: #007bff;
+                background: rgba(0, 0, 0, 1);
                 border-radius: 50%;
                 animation: typing 1.4s infinite ease-in-out;
             }}
+
             .typing-dot:nth-child(2) {{ animation-delay: 0.2s; }}
             .typing-dot:nth-child(3) {{ animation-delay: 0.4s; }}
             .quick-replies {{
@@ -1910,28 +2087,56 @@ def render_chat_page(cb, share_key):
                 gap: 8px;
                 margin-top: 10px;
             }}
-            .quick-reply-btn {{
-                background: rgba(0, 123, 255, 0.1);
+
+            .quick-reply-btn-dark {{
+                background: rgba(0, 0, 0, 1);
                 border: 1px solid rgba(0, 123, 255, 0.3);
-                color: #007bff;
+                color: white;
                 border-radius: 20px;
                 padding: 6px 12px;
                 font-size: 0.85rem;
                 cursor: pointer;
                 transition: all 0.2s ease;
             }}
-            .quick-reply-btn:hover {{
-                background: rgba(0, 123, 255, 0.2);
+
+            .quick-reply-btn-dark:hover {{
+                background: rgba(0, 0, , 1.2);
                 transform: scale(1.05);
             }}
+
+                .btn-dark {{
+                background: rgba(0, 0, 0, 0.9);
+                border: 1px solid rgba(0, 0, 0, 0.3);
+                color: white;
+                border-radius: 0 20px 20px 0;
+                padding: 12px 24px;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }}
+            
+            .btn-dark:hover {{
+                background: rgba(0, 0, 0, 1);
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }}
+            
+            #user_input:focus {{
+                outline: none;
+                border-color: rgba(0, 0, 0, 0.5);
+                box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+            }}
+
             .btn-transparent {{
                 background: transparent;
                 color: #6c757d;
                 border: none;
             }}
+
             .btn-transparent:hover {{
                 background: rgba(108, 117, 125, 0.1);
             }}
+
             .refreshBtn {{
                 position: absolute; /* or fixed if you want it on screen corner */
                 top: 10px;
@@ -1941,17 +2146,21 @@ def render_chat_page(cb, share_key):
                 color: #000 !important;
                 cursor: pointer;
             }}
+
             .refreshBtn:hover {{
                 background: rgba(108, 117, 125, 0.1);
             }}
+
             @keyframes fadeIn {{
                 from {{ opacity: 0; transform: translateY(10px); }}
                 to {{ opacity: 1; transform: translateY(0); }}
             }}
+
             @keyframes typing {{
                 0%, 60%, 100% {{ transform: translateY(0); }}
                 30% {{ transform: translateY(-10px); }}
             }}
+
             @media (max-width: 768px) {{
                 .chat-container {{
                     margin: 10px;
@@ -1964,20 +2173,25 @@ def render_chat_page(cb, share_key):
                     max-width: 85%;
                 }}
             }}
+
         </style>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg">
             <div class="container">
-                {f'<img src="{styles["company_logo"]}" alt="Logo" style="height: 40px; margin-right: 10px;">' if styles['company_logo'] else ''}
-                <span class="navbar-brand fw-bold">{cb['chatbot_name']}</span>
+                <div class="d-flex align-items-center">
+                    {f'<img src="{styles["company_logo"]}" alt="Logo" style="height: 40px; margin-right: 10px;">' if styles['company_logo'] else ''}
+                        <div class="d-flex flex-column">
+                            <span class="navbar-brand fw-bold mb-0" style="line-height: 1;">{cb['chatbot_name']}</span>
+                        </div>
+                </div>
             </div>
         </nav>
         <div class="container-fluid">
     <div class="chat-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="m-0">
-                <i class="fas fa-robot me-2"></i>Chat with {cb['chatbot_name']}
+                Chat with {cb['chatbot_name']}
             </h4>
             <button id="refreshBtn" class="btn btn-transparent btn-sm" type="button" title="Refresh Chat">🔄 Refresh</button>
         </div>
@@ -1993,15 +2207,15 @@ def render_chat_page(cb, share_key):
         </div>
 
         <div class="quick-replies" id="quickReplies">
-            <button class="quick-reply-btn" onclick="sendQuickReply('Dashboard')">Dashboard</button>
-            <button class="quick-reply-btn" onclick="sendQuickReply('Show me the data')">Show data</button>
-            <button class="quick-reply-btn" onclick="sendQuickReply('Help')">Help</button>
-            <button class="quick-reply-btn" onclick="sendQuickReply('What can you do?')">What can you do?</button>
+            <button class="quick-reply-btn-dark" onclick="sendQuickReply('Dashboard')">Dashboard</button>
+            <button class="quick-reply-btn-dark" onclick="sendQuickReply('Show me the data')">Show data</button>
+            <button class="quick-reply-btn-dark" onclick="sendQuickReply('Help')">Help</button>
+            <button class="quick-reply-btn-dark" onclick="sendQuickReply('What can you do?')">What can you do?</button>
         </div>
 
         <div class="input-group mt-3">
-            <input type="text" id="user_input" class="form-control" placeholder="Ask about your data..." autocomplete="off">
-            <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn">
+            <input type="text" id="user_input" class="form-control" placeholder="Ask about your data..." autocomplete="off" style="border-radius: 20px 0 0 20px; border: 1px solid rgba(0, 0, 0, 0.3); padding: 12px 20px;">
+            <button class="btn btn-dark" onclick="sendMessage()" id="sendBtn">
                 <i class="fas fa-paper-plane me-1"></i>Send
             </button>
         </div>

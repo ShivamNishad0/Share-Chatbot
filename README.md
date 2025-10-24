@@ -183,8 +183,12 @@ share-chatbot/
 │   ├── app.py                 # Flask application entry point
 │   ├── config.py              # Configuration settings
 │   ├── requirements.txt       # Python dependencies
+│   ├── chatbots.db            # SQLite database (auto-generated)
 │   ├── app/
 │   │   ├── __init__.py        # Flask app factory
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   └── chatbot.py     # Chatbot model class
 │   │   ├── routes/
 │   │   │   ├── __init__.py
 │   │   │   └── main.py        # Main API routes
@@ -196,9 +200,22 @@ share-chatbot/
 │   │       └── helpers.py     # Utility functions
 ├── frontend/
 │   └── index.php              # Main web interface
+├── docs/
+│   ├── api.md                 # API documentation
+│   ├── user_guide.md          # User instructions
+│   └── developer_guide.md     # Development setup and guidelines
+├── TODO.md                    # Development task tracking
 ├── README.md                  # This file
 └── .gitignore
 ```
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **[API Documentation](docs/api.md)**: Complete API reference with endpoints, request/response formats, and examples
+- **[User Guide](docs/user_guide.md)**: Step-by-step instructions for creating and using chatbots
+- **[Developer Guide](docs/developer_guide.md)**: Development setup, architecture overview, and contribution guidelines
 
 ## Contributing
 
@@ -212,6 +229,7 @@ share-chatbot/
 
 - Follow PEP 8 for Python code
 - Use meaningful commit messages
+- Add comprehensive docstrings to all functions and classes
 - Add tests for new features
 - Update documentation as needed
 - Ensure all data sources are properly tested

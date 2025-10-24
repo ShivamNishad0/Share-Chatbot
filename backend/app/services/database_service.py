@@ -15,13 +15,37 @@ import os
 logger = logging.getLogger(__name__)
 
 class DatabaseService:
+    """
+    Service class for managing chatbot database operations and external data source connections.
+
+    This class handles SQLite database operations for storing chatbot configurations,
+    user management, and provides methods to connect and fetch data from various
+    external data sources including Oracle, MySQL, PostgreSQL, MongoDB, Airtable,
+    Databricks, Supabase, Snowflake, and Odoo.
+
+    Attributes:
+        db_file (str): Path to the SQLite database file (default: 'chatbots.db')
+    """
+
     def __init__(self, db_file='chatbots.db'):
         self.db_file = db_file
 
     def get_connection(self):
+        """
+        Get a SQLite database connection.
+
+        Returns:
+            sqlite3.Connection: Database connection object
+        """
         return sqlite3.connect(self.db_file)
 
     def init_db(self):
+        """
+        Initialize the SQLite database with required tables.
+
+        Creates tables for users, user agreements, chatbots, and password resets
+        if they don't already exist.
+        """
         conn = self.get_connection()
         cursor = conn.cursor()
 
@@ -77,6 +101,7 @@ class DatabaseService:
                 shared_password TEXT,
                 share_key TEXT UNIQUE,
                 company_logo TEXT,
+                company_name TEXT,
                 nav_color TEXT,
                 text_color TEXT,
                 content_bg_color TEXT,
@@ -98,6 +123,13 @@ class DatabaseService:
         logger.info("Database initialized successfully")
 
     def create_user(self, username, password):
+        """
+        Create a new user in the database.
+
+        Args:
+            username (str): Username for the new user
+            password (str): Password for the new user
+        """
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
@@ -105,6 +137,15 @@ class DatabaseService:
         conn.close()
 
     def get_user(self, username):
+        """
+        Retrieve user information by username.
+
+        Args:
+            username (str): Username to look up
+
+        Returns:
+            tuple or None: User data (username, password) or None if not found
+        """
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE username=?", (username,))
@@ -112,13 +153,18 @@ class DatabaseService:
         conn.close()
         return row
 
-
     def save_chatbot(self, chatbot_data):
+        """
+        Save or update a chatbot configuration in the database.
+
+        Args:
+            chatbot_data (dict): Dictionary containing chatbot configuration data
+        """
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT OR REPLACE INTO chatbots (id, username, chatbot_name, gemini_api_key, gemini_model, data_source, sheet_id, selected_sheets, service_account_json, db_host, db_port, db_name, db_username, db_password, selected_tables, mongo_uri, mongo_db_name, selected_collections, airtable_api_key, airtable_base_id, databricks_hostname, databricks_http_path, databricks_token, supabase_url, supabase_anon_key, snowflake_account, snowflake_user, snowflake_password, snowflake_warehouse, snowflake_database, snowflake_schema, snowflake_role, share_key, company_logo, nav_color, text_color, content_bg_color, textarea_color, textarea_border_color, textarea_border_thickness, button_color, button_text_color, border_color, border_thickness, nav_border_color, nav_border_thickness, odoo_url, odoo_db, odoo_username, odoo_password, selected_module, shared_username, shared_password)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO chatbots (id, username, chatbot_name, gemini_api_key, gemini_model, data_source, sheet_id, selected_sheets, service_account_json, db_host, db_port, db_name, db_username, db_password, selected_tables, mongo_uri, mongo_db_name, selected_collections, airtable_api_key, airtable_base_id, databricks_hostname, databricks_http_path, databricks_token, supabase_url, supabase_anon_key, snowflake_account, snowflake_user, snowflake_password, snowflake_warehouse, snowflake_database, snowflake_schema, snowflake_role, share_key, company_logo, company_name, nav_color, text_color, content_bg_color, textarea_color, textarea_border_color, textarea_border_thickness, button_color, button_text_color, border_color, border_thickness, nav_border_color, nav_border_thickness, odoo_url, odoo_db, odoo_username, odoo_password, selected_module, shared_username, shared_password)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             chatbot_data['id'],
             chatbot_data['username'],
@@ -154,6 +200,7 @@ class DatabaseService:
             chatbot_data.get('snowflake_role'),
             chatbot_data.get('share_key'),
             chatbot_data.get('company_logo'),
+            chatbot_data.get('company_name'),
             chatbot_data.get('nav_color'),
             chatbot_data.get('text_color'),
             chatbot_data.get('content_bg_color'),
@@ -178,6 +225,15 @@ class DatabaseService:
         conn.close()
 
     def get_chatbots_by_user(self, username):
+        """
+        Retrieve all chatbots for a specific user.
+
+        Args:
+            username (str): Username to filter chatbots by
+
+        Returns:
+            list[dict]: List of chatbot configurations as dictionaries
+        """
         conn = self.get_connection()
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
@@ -196,7 +252,7 @@ class DatabaseService:
             version (int): Oracle version (19 or 23)
 
         Returns:
-            list[dict]: Query results as list of dicts
+            list[dict]: Query results as list of dicts, or error dict on failure
         """
         conn = None
         cur = None
@@ -250,7 +306,7 @@ class DatabaseService:
             query (str): SQL SELECT query
 
         Returns:
-            list[dict]: Query results as list of dicts
+            list[dict]: Query results as list of dicts, or error dict on failure
         """
         conn = None
         cur = None
@@ -294,7 +350,7 @@ class DatabaseService:
             query (str): Table name to fetch from
 
         Returns:
-            list[dict]: Records as list of dicts
+            list[dict]: Records as list of dicts, or error dict on failure
         """
         try:
             api = Api(creds['api_key'])
@@ -320,7 +376,7 @@ class DatabaseService:
                 query (str): SQL SELECT query
 
             Returns:
-                list[dict]: Query results as list of dicts
+                list[dict]: Query results as list of dicts, or error dict on failure
             """
             conn = None
             cur = None
@@ -364,7 +420,7 @@ class DatabaseService:
             query (str): Table name to fetch from, or None/'all' to list all tables
 
         Returns:
-            list[dict] or list[str]: Records as list of dicts, or list of table names if query is None/'all'
+            list[dict] or list[str]: Records as list of dicts, or list of table names if query is None/'all', or error dict on failure
         """
         try:
             supabase: Client = create_client(creds['url'], creds['anon_key'])
@@ -400,7 +456,7 @@ class DatabaseService:
             query (str): SQL SELECT query, or None/'all' to list all tables
 
         Returns:
-            list[dict]: Query results as list of dicts, or list of table names if query is None/'all'
+            list[dict]: Query results as list of dicts, or list of table names if query is None/'all', or error dict on failure
         """
         conn = None
         cur = None
@@ -451,7 +507,7 @@ class DatabaseService:
             query (str): Model name to fetch from, e.g. 'product.product'
 
         Returns:
-            list[dict]: Records as list of dicts
+            list[dict]: Records as list of dicts, or error dict on failure
         """
         try:
             url = creds['url']

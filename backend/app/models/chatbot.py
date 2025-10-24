@@ -1,4 +1,44 @@
 class Chatbot:
+    """
+    Represents a chatbot configuration with various data source integrations.
+
+    This class encapsulates all the necessary information to configure and run a chatbot
+    that can connect to multiple data sources like Google Sheets, databases, APIs, etc.
+    It supports different authentication methods and data source types.
+
+    Attributes:
+        id (str): Unique identifier for the chatbot
+        username (str): Owner of the chatbot
+        chatbot_name (str): Display name of the chatbot
+        gemini_api_key (str): API key for Google Gemini AI
+        gemini_model (str): Gemini model to use (e.g., 'gemini-1.5-flash')
+        data_source (str): Type of data source ('google_sheets', 'mysql', 'postgresql', etc.)
+        sheet_id (str): Google Sheets ID (for Google Sheets data source)
+        selected_sheets (list): List of selected sheet names
+        service_account_json (str): JSON string for Google service account credentials
+        db_host (str): Database host URL/IP
+        db_port (int): Database port number
+        db_name (str): Database name
+        db_username (str): Database username
+        db_password (str): Database password
+        selected_tables (list): List of selected table names
+        mongo_uri (str): MongoDB connection URI
+        mongo_db_name (str): MongoDB database name
+        selected_collections (list): List of selected MongoDB collections
+        airtable_api_key (str): Airtable API key
+        airtable_base_id (str): Airtable base ID
+        databricks_hostname (str): Databricks server hostname
+        databricks_http_path (str): Databricks HTTP path
+        databricks_token (str): Databricks access token
+        odoo_url (str): Odoo server URL
+        odoo_db (str): Odoo database name
+        odoo_username (str): Odoo username
+        odoo_password (str): Odoo password
+        selected_module (str): Selected Odoo module ('CRM', 'Inventory', 'Sales')
+        shared_username (str): Username for shared chatbot access
+        shared_password (str): Password for shared chatbot access
+    """
+
     def __init__(self, id, username, chatbot_name, gemini_api_key, gemini_model,
                  data_source=None, sheet_id=None, selected_sheets=None,
                  service_account_json=None, db_host=None, db_port=None,
@@ -40,6 +80,12 @@ class Chatbot:
         self.shared_password = shared_password
 
     def to_dict(self):
+        """
+        Convert the Chatbot instance to a dictionary representation.
+
+        Returns:
+            dict: Dictionary containing all chatbot attributes
+        """
         return {
             'id': self.id,
             'username': self.username,
@@ -75,6 +121,15 @@ class Chatbot:
 
     @classmethod
     def from_dict(cls, data):
+        """
+        Create a Chatbot instance from a dictionary.
+
+        Args:
+            data (dict): Dictionary containing chatbot attributes
+
+        Returns:
+            Chatbot: New Chatbot instance
+        """
         return cls(
             id=data.get('id'),
             username=data.get('username'),
